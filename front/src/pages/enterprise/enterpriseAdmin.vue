@@ -1,6 +1,6 @@
 <template>
     <div>
-      <q-page padding>
+      <q-page class="q-gutter-md" padding>
           <h4>Administrar empresas</h4>
           <div class="row q-col-gutter-md">
               <div class="col-3">
@@ -10,83 +10,83 @@
           <div v-if="adminData !== 'null'">
             <div class="row q-col-gutter-md">
           <div class="col-2">
-            <q-btn @click="softInfo()">Subir información de software</q-btn>
+            <q-btn class="q-ml-xs btn-limon" @click="softInfo()">Subir información de software</q-btn>
           </div>
           <div class="col-2">
-            <q-btn @click="certificateUp()">Subir certificado</q-btn>
+            <q-btn class="q-ml-xs" color="cyan-5" @click="certificateUp()">Subir certificado</q-btn>
           </div>
           <div class="col-2">
-            <q-btn @click="enterpriseUpdate()">Actualizar empresa</q-btn>
+            <q-btn class="q-ml-xs" color="orange-5" @click="enterpriseUpdate()">Actualizar empresa</q-btn>
           </div>
           <div class="col-2">
-            <q-btn @click="resolutions()">Ver resoluciones</q-btn>
+            <q-btn class="q-ml-xs" color="teal-5" @click="resolutions()">Ver resoluciones</q-btn>
           </div>
           <div class="col-2">
-            <q-btn @click="productionNumbers()">Ver numeros de produccion</q-btn>
+            <q-btn class="q-ml-xs btn-limon" @click="productionNumbers()">Ver numeros de produccion</q-btn>
           </div>
         </div>
             <h5>Generales</h5>
                 <div class="row q-col-gutter-md">
                   <div class="col-3">
-                      <p>Nombre de la empresa</p>
+                      <p class="parrafoLabel">Nombre de la empresa</p>
                       <p>{{ adminData.business_name}}</p>
                     </div>
                     <div class="col-3">
-                      <p>Tipo de documento</p>
+                      <p class="parrafoLabel">Tipo de documento</p>
                       <p>{{ adminData.type_document_identification_id}}</p>
                     </div>
                     <div class="col-3">
-                      <p>NIT</p>
+                      <p class="parrafoLabel">NIT</p>
                       <p>{{ adminData.nit}}</p>
                     </div>
                     <div class="col-3">
-                        <p>Dirección</p>
+                        <p class="parrafoLabel">Dirección</p>
                         <p>{{ adminData.address}}</p>
                     </div>
                     <div class="col-3">
-                      <p>Telefono</p>
+                      <p class="parrafoLabel">Telefono</p>
                       <p>{{ adminData.phone}}</p>
                     </div>
                     <div class="col-3">
-                      <p>Correo electronico</p>
+                      <p class="parrafoLabel">Correo electronico</p>
                       <p>{{ adminData.email}}</p>
                     </div>
                     <div class="col-3">
-                      <p>Documento del representante</p>
+                      <p class="parrafoLabel">Documento del representante</p>
                       <p>{{ adminData.ceo_document}}</p>
                     </div>
                 </div>
                 <h5>Software</h5>
                 <div class="row q-col-gutter-md">
                    <div class="col-3">
-                     <p>Software ID</p>
+                     <p class="parrafoLabel">Software ID</p>
                       <p>{{ adminData.software_id}}</p>
                     </div>
                    <div class="col-3">
-                     <p>Software PIN</p>
+                     <p class="parrafoLabel">Software PIN</p>
                       <p>{{ adminData.software_pin}}</p>
                    </div>
                     <div class="col-3">
-                      <p>Software URL</p>
+                      <p class="parrafoLabel">Software URL</p>
                       <p>{{ adminData.software_url}}</p>
                     </div>
                     <div class="col-3">
-                      <p>Respuesta del software</p>
+                      <p class="parrafoLabel">Respuesta del software</p>
                       <p>{{ adminData.last_software_response}}</p>
                     </div>
                 </div>
                 <h5>Certificado</h5>
                 <div class="row q-col-gutter-md">
                   <div class="col-3">
-                    <p>Certificado</p>
+                    <p class="parrafoLabel">Certificado</p>
                     <p>{{ adminData.certificate}}</p>
                   </div>
                   <div class="col-3">
-                    <p>Contraseña del certificado</p>
+                    <p class="parrafoLabel">Contraseña del certificado</p>
                     <p>{{ adminData.certificate_password}}</p>
                   </div>
                   <div class="col-3">
-                    <p>Respuesta del certificado</p>
+                    <p class="parrafoLabel">Respuesta del certificado</p>
                     <p>{{ adminData.last_certificate_response}}</p>
                   </div>
                 </div>
@@ -229,3 +229,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.parrafoLabel {
+font-size: 18px;
+}
+</style>
