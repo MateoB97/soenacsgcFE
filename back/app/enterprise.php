@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Tools;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\BroadcastsEvents;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class enterprise extends Model
 {
@@ -69,4 +71,30 @@ class enterprise extends Model
         return
         DB::select("select * from enterprises");
     }
+
+    // protected $events = [
+    //     'updated' => enterpriseUpdated::class,
+    // ];
 }
+
+// class Post extends Model
+// {
+//     use BroadcastsEvents, HasFactory;
+//     /**
+//      * Get the user that the post belongs to.
+//      */
+//     public function user()
+//     {
+//         return $this->belongsTo(User::class);
+//     }
+//     /**
+//      * Get the channels that model events should broadcast on.
+//      *
+//      * @param  string  $event
+//      * @return \Illuminate\Broadcasting\Channel|array
+//      */
+//     public function broadcastOn($event)
+//     {
+//         return [$this, $this->user];
+//     }
+// }

@@ -65,7 +65,6 @@
                 <q-btn v-if="showForUpdate" color="primary" v-on:click="globalValidate('guardar-edicion', storeItems.id)" label="Guardar Edición" />
             </div>
         </div>
-
         <div class="row q-mt-xl">
             <q-table
                 title= "Listado de empresas"
@@ -99,7 +98,7 @@
 
                 <q-td slot="body-cell-actions" slot-scope="props" :props="props">
                     <q-btn class="q-ml-xs btn-coral" icon-right="delete" @click="eliminarEmpresa(props.value)">Eliminar</q-btn>
-                    <q-btn class="q-ml-xs btn-naranja" icon-right="edit" @click="administrarEmpresa(props.value)">Administrar</q-btn>
+                    <q-btn class="q-ml-xs btn-naranja" icon-right="edit" @click="editarEmpresa(props.value)">Editar</q-btn>
                 </q-td>
             </q-table>
         </div>
@@ -189,7 +188,7 @@ export default {
       }).onDismiss(() => {
       })
     },
-    administrarEmpresa (id) {
+    editarEmpresa (id) {
       this.globalValidate('editar', id)
     }
   },

@@ -18,6 +18,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        // 'App\Events\enterpriseUpdated' => [
+        //     'App\Listeners\SendEnterpriseUpdatedConfirmation'
+        // ]
     ];
 
     /**
@@ -29,6 +32,5 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
     }
 }

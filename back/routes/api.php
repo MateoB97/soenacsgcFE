@@ -85,12 +85,13 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('enterprises', 'enterpriseController@index');
     Route::get('enterprises/{id}', 'enterpriseController@show');
     Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
-    Route::get('enterprises/soenac/resolutions', 'enterpriseController@resolutions');
     Route::get('enterprises/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('enterprises/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
     Route::post('enterprises', 'enterpriseController@store');
-    Route::post('enterprises/soenac/softInfo', 'enterpriseController@softInfo');
+    Route::post('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::post('enterprises/soenac/productionNumbers', 'enterpriseController@productionNumbers');
+    Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
+    Route::post('enterprises/soenac/resolutions', 'enterpriseController@resolutions');
     Route::put('enterprises/{id}', 'enterpriseController@update');
     Route::put('enterprises/certificateUp/{id}', 'enterpriseController@certificateUp');
     Route::put('enterprises/enterpriseUpdate/{id}', 'enterpriseController@enterpriseUpdate');
