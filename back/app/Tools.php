@@ -31,7 +31,7 @@ class Tools extends Model
         return $response;
     }
 
-    public static function http_post($url, $body){
+    public static function http_post($url, $body, $authorization){
 
         $ch = curl_init();
 
@@ -40,7 +40,7 @@ class Tools extends Model
 	        CURLOPT_CUSTOMREQUEST  => "POST",
 	        CURLOPT_RETURNTRANSFER => true,
 	        CURLOPT_HTTPHEADER => TRUE,
-	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json'),
+	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
 	        CURLOPT_POSTFIELDS => json_encode($body)
 	    ];
 
@@ -53,7 +53,7 @@ class Tools extends Model
         return $response;
     }
 
-    public static function http_put($url, $body){
+    public static function http_put($url, $body, $authorization){
 
         $ch = curl_init();
 
@@ -62,7 +62,7 @@ class Tools extends Model
 	        CURLOPT_CUSTOMREQUEST  => "PUT",
 	        CURLOPT_RETURNTRANSFER => true,
 	        CURLOPT_HTTPHEADER => TRUE,
-	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json'),
+	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
 	        CURLOPT_POSTFIELDS => json_encode($body)
 	    ];
 

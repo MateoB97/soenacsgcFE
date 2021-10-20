@@ -119,8 +119,6 @@ export const globalFunctions = {
       }
       if (itemNull !== 1) {
         this.$q.notify({ color: 'warning', message: 'Guardando item...' })
-        // console.log(this.storeItems)
-        // console.log(this.$store.state.jhsoft.url + this.urlAPI)
         axios.post(this.$store.state.jhsoft.url + this.urlAPI, this.storeItems).then(
           function (response) {
             if (response.data === 'done') { // si se desea restaurar el formulario el api debe devolver "done"

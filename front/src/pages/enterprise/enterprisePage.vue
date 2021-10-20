@@ -26,7 +26,7 @@
               <q-input type="text" v-model="storeItems.merchant_registration" label="Registro mercantil"/>
             </div>
             <div class="col-3">
-              <q-select v-model="storeItems.municipalities" use-input hide-selected fill-input option-label="name" :options="options.municipalities" label="Municipalidad" option-disable="inactive" option-value="id" map-options emit-value input-debounce="0" @input="sendToParent()"/>
+              <q-select v-model="storeItems.municipality_id" use-input hide-selected fill-input option-label="name" :options="options.municipalities" label="Municipalidad" option-disable="inactive" option-value="id" map-options emit-value input-debounce="0" @input="sendToParent()"/>
             </div>
             <div class="col-3">
               <q-input type="text" v-model="storeItems.address" label="Dirección"/>
@@ -156,6 +156,7 @@ export default {
         { name: 'last_certificate_response', required: true, label: 'respuesta de certificado', align: 'left', field: 'last_certificate_response', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'last_update_enterprise_response', required: true, label: 'respuesta de actualización', align: 'left', field: 'last_update_enterprise_response', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'ceo_document', required: true, label: 'Doc rep legal', align: 'left', field: 'ceo_document', sortable: true, classes: 'my-class', style: 'width: 200px' },
+        { name: 'municipality_id', required: true, label: 'Municipalidad', align: 'left', field: 'municipality_id', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'actions', required: true, label: 'Acciones', align: 'left', field: 'id', sortable: true, classes: 'my-class', style: 'width: 200px' }
       ],
       visibleColumns: ['id', 'nombre', 'actions']
@@ -166,11 +167,11 @@ export default {
     postSave () {
     },
     preSave () {
-      // this.storeItems.nit = this.storeItems.nit
       this.storeItems.last_software_response = this.storeItems.last_software_response ? this.storeItems.last_software_response : ''
       this.storeItems.last_certificate_response = this.storeItems.last_certificate_response ? this.storeItems.last_certificate_response : ''
       this.storeItems.last_update_enterprise_response = this.storeItems.last_update_enterprise_response ? this.storeItems.last_update_enterprise_response : ''
-      // this.storeItems.nit = this.storeItems.nit ? this.storeItems.nit : ''
+      this.storeItems.municipality_id = this.storeItems.municipality_id ? this.storeItems.municipality_id : ''
+      this.storeItems.token = this.storeItems.token ? this.storeItems.token : ''
     },
     postEdit () {
     },

@@ -10,7 +10,6 @@
           <div class="row q-mt-md">
             <div class="col-2">
                 <q-btn v-if="!showForUpdate" color="primary" v-on:click="globalValidate('guardar')" label="Guardar" />
-                <q-btn v-if="showForUpdate" color="primary" v-on:click="globalValidate('guardar-edicion', storeItems.id)" label="Guardar Edición" />
             </div>
         </div>
         </q-page>

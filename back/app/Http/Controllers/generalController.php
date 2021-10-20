@@ -21,8 +21,15 @@ class generalController extends Controller
     public function store(Request $request)
     {
         //
-        $nuevoGeneral = new general ($request->all());
-        $nuevoGeneral->save();
+        if (general::all()->isNotEmpty()) {
+            $generalUp = general::first();
+            $generalUp->fill($request->all());
+            $generalUp->save();
+        }
+        else {
+            $nuevoGeneral = new general ($request->all());
+            $nuevoGeneral->save();
+        }
 
         return 'done';
     }

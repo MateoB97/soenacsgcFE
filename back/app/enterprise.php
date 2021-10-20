@@ -32,7 +32,8 @@ class enterprise extends Model
         'last_software_response',
         'last_certificate_response',
         'last_update_enterprise_response',
-        'nit'
+        'nit',
+        'municipality_id'
     ];
 
     protected $columns = array(
@@ -55,7 +56,8 @@ class enterprise extends Model
         'last_software_response',
         'last_certificate_response',
         'last_update_enterprise_response',
-        'nit'
+        'nit',
+        'municipality_id'
     );
 
     public function getDateFormat()

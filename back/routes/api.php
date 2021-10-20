@@ -87,14 +87,14 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
     Route::get('enterprises/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('enterprises/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
-    Route::post('enterprises', 'enterpriseController@store');
-    Route::post('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
-    Route::post('enterprises/soenac/productionNumbers', 'enterpriseController@productionNumbers');
     Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
-    Route::post('enterprises/soenac/resolutions', 'enterpriseController@resolutions');
+    Route::get('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
+    Route::get('enterprises/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
+    Route::post('enterprises/soenac/resolutions/{request}', 'enterpriseController@resolutions');
+    Route::post('enterprises', 'enterpriseController@store');
     Route::put('enterprises/{id}', 'enterpriseController@update');
     Route::put('enterprises/certificateUp/{id}', 'enterpriseController@certificateUp');
-    Route::put('enterprises/enterpriseUpdate/{id}', 'enterpriseController@enterpriseUpdate');
+    Route::put('enterprises/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
     Route::delete('enterprises/{id}', 'enterpriseController@Destroy');
 
     Route::get('/generals', 'generalController@index');

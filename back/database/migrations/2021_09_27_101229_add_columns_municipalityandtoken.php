@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSendConfirmColToEnterpriseTab extends Migration
+class AddColumnsMunicipalityandtoken extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddSendConfirmColToEnterpriseTab extends Migration
     public function up()
     {
         Schema::table('enterprises', function (Blueprint $table) {
-            $table->boolean('sendConfirm')->default(false)->after('nit');
+            $table->integer('municipality_id')->nullable();
+            $table->string('token')->nullable();
         });
     }
 
@@ -26,7 +27,8 @@ class AddSendConfirmColToEnterpriseTab extends Migration
     public function down()
     {
         Schema::table('enterprises', function (Blueprint $table) {
-            $table->dropColumn('sendConfirm');
+            $table->dropColumn('municipality_id');
+            $table->dropColumn('token');
         });
     }
 }

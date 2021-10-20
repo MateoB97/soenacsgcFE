@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\enterprise;
+use App\general;
 use App;
 use App\Http\Exports\FiltroApi;
 use App\Tools;
@@ -50,23 +51,30 @@ class enterpriseController extends Controller
         return json_encode(Tools::filterApi($url, $fieldsToFilter , $structureToFilter));
     }
 
-    public function resolutions() {
-          
-        $resolutionData = collect();
+    public function resolutions($request) {
+        
+        $resolutionData = array();
 
-        $resolutionData->type_document_id = 1;
-        $resolutionData->from = 990000000;
-        $resolutionData->to = 995000000;
-        $resolutionData->resolution = 18760000001;
-        $resolutionData->resolution_date = "0001-01-01";
-        $resolutionData->technical_key = "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c";
-        $resolutionData->date_from = "2019-01-19";
-        $resolutionData->date_to = "2030-01-19";
-        $resolutionData->prefix = "SETP";
+        $resolutionData['type_document_id'] = 1;
+        $resolutionData['from'] = 990000000;
+        $resolutionData['to'] = 995000000;
+        $resolutionData['resolution'] = 18760000001;
+        $resolutionData['resolution_date'] = "0001-01-01";
+        $resolutionData['technical_key'] = "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c";
+        $resolutionData['date_from'] = "2019-01-19";
+        $resolutionData['date_to'] = "2030-01-19";
+        $resolutionData['prefix'] = "SETP";
 
         $url = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
-        $datos = Tools::http_post($url, $resolutionData);
-        // dd(json_encode($datos));
+
+        if ($enterprise->type_environments === 1) {
+            $authorization = "Authorization: Bearer ". $general->masterToken;
+        } else if ($enterprise->type_environments === 2){
+            $authorization = "Authorization: Bearer ". $enterprise->token;
+        }
+
+        $datos = Tools::http_post($url, $resolutionData, $authorization);
+        
         return json_encode($datos);
     }
 
@@ -98,81 +106,89 @@ class enterpriseController extends Controller
     public function confirmEnterpriseDian($id)
     {
 
-        return $id;
-        // $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $request->nit;
+        $enterprise = enterprise::find($id);
         
-        // // $data = collect();
-        // $data = new \stdClass();
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $enterprise->nit;
         
-        // $data->type_document_identification_id = $request->type_document_identification_id;
-        // $data->type_organization_id = $request->type_organization_id;
-        // $data->type_regime_id = $request->type_regime_id;
-        // $data->type_liability_id = $request->type_liability_id;
-        // $data->business_name = $request->business_name;
-        // $data->merchant_registration = $request->merchant_registration;
-        // $data->municipality_id = $request->municipality_id;
-        // $data->address = $request->address;
-        // $data->phone = $request->phone;
-        // $data->email = $request->email;
+        $data = array();
+        
+        $data['type_document_identification_id']   = $enterprise->type_document_identification_id;
+        $data['type_organization_id']              = $enterprise->type_organization_id;
+        $data['type_regime_id']                    = $enterprise->type_regime_id;
+        $data['type_liability_id']                 = $enterprise->type_liability_id;
+        $data['business_name']                     = $enterprise->business_name;
+        $data['merchant_registration']             = $enterprise->merchant_registration;
+        $data['municipality_id']                   = $enterprise->municipality_id;
+        $data['address']                           = $enterprise->address;
+        $data['phone']                             = $enterprise->phone;
+        $data['email']                             = $enterprise->email;
 
-        // $response = Tools::http_post($urlPost, $data);
+        $authorization = "Authorization: Bearer DjSeSssNuNaE3ihrqcWLIMUsHk7XMwWQm5vgp7PR8JPmVcIhHbWI9zFrcMoNBVIUhg51OouaCVUZYTwO";
 
-        // if ($response === true) {
-        //     $request->sendConfirm = true;
-        //     $campoEdit = enterprise::find($request->id);
-        //     $campoEdit->sendConfirm = $request->sendConfirm;
-        //     $campoEdit->save();
+        $response = Tools::http_post($urlPost, $data, $authorization);
 
-        //     $info = collect();
-        //     $info->token = $response;
-        //     $info->mensaje = 'empresa guardada';
-        //     return $info;
-        // }
-        // else {
-        //     $info = collect();
-        //     $info->token = $response;
-        //     $info->mensaje = 'la empresa no se guardo';
-        //     return $info;
-        // }
+        $enterprise->token = $response;
+
+        $enterprise->save();
+
+        return $response;
     }
 
     public function softInfo($id)
     {
-        $data = enterprise::find($id);
+        $enterprise = enterprise::find($id);
 
-        $enterprise = collect();
+        $data = array();
 
-        $enterprise->id = $data->id;
-        $enterprise->software_id = $data->software_id;
-        $enterprise->software_pin = $data->software_pin;
-        $enterprise->software_url = $data->software_url;
+        $data['software_id']  = $enterprise->software_id;
+        $data['software_pin'] = $enterprise->software_pin;
+        $data['software_url'] = $enterprise->software_url;
 
         $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/software';
-        $datos = Tools::http_post($urlPost, $enterprise);
         
-        $data->last_software_response = $datos;
-        $data->save();
+        if ($enterprise->type_environments === 2) {
+            $authorization = "Authorization: Bearer ". $general->masterToken;
+        } else if ($enterprise->type_environments === 1){
+            $authorization = "Authorization: Bearer ". $enterprise->token;
+        }
+
+        $response = Tools::http_post($urlPost, $data, $authorization);
+        
+        $enterprise->last_software_response = $response;
+
+        $enterprise->save();
+
         $info = collect();
-        $info->response = $datos;
+        $info->response = $respoonse;
         if ($datos === true) {
-            $info->mensaje = 'Respuesta de software positiva';
+            $info->mensaje = 'Positivo';
         }
         else {
-            $info->mensaje = 'Respuesta de software negativa';
+            $info->mensaje = 'Negativo';
         }
         return $info;
     }
 
     public function productionNumbers($id) 
     {
-        $data = enterprise::find($id);
+        $enterprise = enterprise::find($id);
+        $general = general::all()->first();
 
-        $enterprise = collect();
-        $enterprise->nit = $data->nit;
-        $enterprise->software_id = $data->software_id;
+        $data = array();
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/numbering/range' . '/' . $enterprise->nit . '/' . $enterprise->nit . '/' . $enterprise->software_id;
+        
+        if ($enterprise->type_environments === '1') {
+            $authorization = "Authorization: Bearer ". $general->masterToken;
+        } else if ($enterprise->type_environments === '2'){
+            $authorization = "Authorization: Bearer ". $enterprise->token;
+        }
 
-        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/numbering/range' + '/' + $request->nit + '/' + $request->nit + '/' + $request->software_id;
-        $datos = Tools::http_post($urlPost, $request);
+        $datos = Tools::http_post($urlPost, $data, $authorization);
+        // dd(json_decode($datos));
+        // json_encode($datos);
+        // // $response = $datos['data']['responseDian']['Envelope']['Body']['GetNumberingRangeResponse']['GetNumberingRangeResult']['ResponseList'];
+        // $response = $datos->data->responseDian->Envelope->Body->GetNumberingRangeResponse->GetNumberingRangeResult->ResponseList;
+        // dd($response);
         return $datos;
     }
 
@@ -219,26 +235,34 @@ class enterpriseController extends Controller
         return 'done';
     }
 
-    public function enterpriseUpdate($id)
+    public function enterpriseUpdating($id)
     {
-        $data = enterprise::find($id);
+        $enterprise = enterprise::find($id);
 
-        $enterprise = collect();
-        $enterprise->id = $data->id;
-        $enterprise->type_document_identification_id = $data->type_document_identification_id;
-        $enterprise->type_environment_id = $data->type_environment_id;
-        $enterprise->type_organization_id = $data->type_organization_id;
-        $enterprise->type_regime_id = $data->type_regime_id;
-        $enterprise->type_liability_id = $data->type_liability_id;
-        $enterprise->business_name = $data->business_name;
-        $enterprise->merchant_registration = $data->merchant_registration;
-        $enterprise->municipality_id = $data->municipality_id;
-        $enterprise->address = $data->address;
-        $enterprise->phone = $data->phone;
-        $enterprise->email = $data->email;
+        $data = array();
 
-        $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/'.$data->nit;
-        $datos = Tools::http_put($urlPut, $enterprise);
+        $data['id']                              = $enterprise->id;
+        $data['type_document_identification_id'] = $enterprise->type_document_identification_id;
+        $data['type_environment_id']             = $enterprise->type_environment_id;
+        $data['type_organization_id']            = $enterprise->type_organization_id;
+        $data['type_regime_id']                  = $enterprise->type_regime_id;
+        $data['type_liability_id']               = $enterprise->type_liability_id;
+        $data['business_name']                   = $enterprise->business_name;
+        $data['merchant_registration']           = $enterprise->merchant_registration;
+        $data['municipality_id']                 = $enterprise->municipality_id;
+        $data['address']                         = $enterprise->address;
+        $data['phone']                           = $enterprise->phone;
+        $data['email']                           = $enterprise->email;
+
+        $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/'.$enterprise->nit;
+
+        if ($enterprise->type_environments === 2) {
+            $authorization = "Authorization: Bearer ". $general->masterToken;
+        } else if ($enterprise->type_environments === 1){
+            $authorization = "Authorization: Bearer ". $enterprise->token;
+        }
+
+        $datos = Tools::http_put($urlPut, $data, $authorization);
 
         $info = collect();
         if ($datos === true) {
@@ -252,20 +276,27 @@ class enterpriseController extends Controller
         return $info;
     }
 
-    public function certificateUp(Request $request)
+    public function certificateUp($id)
     {
-        $data = enterprise::find($id);
+        $enterprise = enterprise::find($id);
 
-        $enterprise = collect();
-        $enterprise->id = $data->id;
-        $enterprise->certificate = $data->certificate;
-        $enterprise->certificate_password = $data->certificate_password;
+        $data = array();
+
+        $data['certificate']          = $enterprise->certificate;
+        $data['certificate_password'] = $enterprise->certificate_password;
 
         $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/certificate';
-        $datos = Tools::http_put($urlPut, $request);
         
-        $data->last_certificate_response = $datos;
-        $data->save();
+        if ($enterprise->type_environments === 2) {
+            $authorization = "Authorization: Bearer ". $general->masterToken;
+        } else if ($enterprise->type_environments === 1){
+            $authorization = "Authorization: Bearer ". $enterprise->token;
+        }
+
+        $response = Tools::http_put($urlPut, $data, $authorization);
+        
+        $enterprise->last_certificate_response = $response;
+        $enterprise->save();
         return 'done';
     }
 
