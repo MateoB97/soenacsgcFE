@@ -18,12 +18,12 @@ class enterpriseController extends Controller
         /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response 
+     * @return \Illuminate\Http\Response
      */
     public function index() {
         return $index = enterprise::all();
     }
-    
+
     public function adminIndex() {
         $arrayBuckets = array();
         $index = enterprise::all()->toArray();
@@ -41,9 +41,9 @@ class enterpriseController extends Controller
         // return $index;
         return $arrayBuckets;
     }
-    
+
     public function soenacCampos() {
-    
+
         $structureToFilter = ['type_document_identifications', 'type_organizations', 'type_regimes', 'type_liabilities','municipalities', 'type_environments'];
         $fieldsToFilter = ['name','id'];
         $url = "https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/listings";
@@ -52,7 +52,7 @@ class enterpriseController extends Controller
     }
 
     public function resolutions($request) {
-        
+
         $resolutionData = array();
 
         $resolutionData['type_document_id'] = 1;
@@ -74,7 +74,7 @@ class enterpriseController extends Controller
         }
 
         $datos = Tools::http_post($url, $resolutionData, $authorization);
-        
+
         return json_encode($datos);
     }
 
@@ -100,18 +100,18 @@ class enterpriseController extends Controller
         $nuevaEmpresa = new enterprise ($request->all());
         $nuevaEmpresa->save();
         return 'done';
-        
+
     }
 
     public function confirmEnterpriseDian($id)
     {
 
         $enterprise = enterprise::find($id);
-        
+
         $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $enterprise->nit;
-        
+
         $data = array();
-        
+
         $data['type_document_identification_id']   = $enterprise->type_document_identification_id;
         $data['type_organization_id']              = $enterprise->type_organization_id;
         $data['type_regime_id']                    = $enterprise->type_regime_id;
@@ -127,7 +127,7 @@ class enterpriseController extends Controller
 
         $response = Tools::http_post($urlPost, $data, $authorization);
 
-        $enterprise->token = $response;
+        $enterprise->token = $response; // validar sin errores para no introducir en bd el error
 
         $enterprise->save();
 
@@ -145,7 +145,7 @@ class enterpriseController extends Controller
         $data['software_url'] = $enterprise->software_url;
 
         $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/software';
-        
+
         if ($enterprise->type_environments === 2) {
             $authorization = "Authorization: Bearer ". $general->masterToken;
         } else if ($enterprise->type_environments === 1){
@@ -153,7 +153,7 @@ class enterpriseController extends Controller
         }
 
         $response = Tools::http_post($urlPost, $data, $authorization);
-        
+
         $enterprise->last_software_response = $response;
 
         $enterprise->save();
@@ -169,14 +169,14 @@ class enterpriseController extends Controller
         return $info;
     }
 
-    public function productionNumbers($id) 
+    public function productionNumbers($id)
     {
         $enterprise = enterprise::find($id);
         $general = general::all()->first();
 
         $data = array();
         $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/numbering/range' . '/' . $enterprise->nit . '/' . $enterprise->nit . '/' . $enterprise->software_id;
-        
+
         if ($enterprise->type_environments === '1') {
             $authorization = "Authorization: Bearer ". $general->masterToken;
         } else if ($enterprise->type_environments === '2'){
@@ -272,7 +272,7 @@ class enterpriseController extends Controller
         else {
             $info->mensaje = 'Actualización DIAN fallo';
         }
-        
+
         return $info;
     }
 
@@ -286,7 +286,7 @@ class enterpriseController extends Controller
         $data['certificate_password'] = $enterprise->certificate_password;
 
         $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/certificate';
-        
+
         if ($enterprise->type_environments === 2) {
             $authorization = "Authorization: Bearer ". $general->masterToken;
         } else if ($enterprise->type_environments === 1){
@@ -294,7 +294,7 @@ class enterpriseController extends Controller
         }
 
         $response = Tools::http_put($urlPut, $data, $authorization);
-        
+
         $enterprise->last_certificate_response = $response;
         $enterprise->save();
         return 'done';

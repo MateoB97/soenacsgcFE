@@ -83,6 +83,7 @@ module.exports = function (ctx) {
         'QTabs',
         'QTab',
         'QBtnDropdown'
+        // 'QResponsive' <----------consultar componente
       ],
       directives: [
         'Ripple',
@@ -93,9 +94,10 @@ module.exports = function (ctx) {
         'Notify',
         'Dialog',
         'Loading'
-      ]
+      ],
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons-v4'
       // i18n: 'de' // Quasar language
+      cssAddon: true
     },
     // animations: 'all' --- includes all animations
     animations: [],

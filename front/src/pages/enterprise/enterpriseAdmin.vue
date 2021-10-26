@@ -23,54 +23,57 @@
       </div>
       <div class="row" v-if="adminData !== 'null'">
 
-        <div class="col">
+        <div class="column q-col-gutter-md items-start">
+          <info-component
+          :title="title[0]"
+          :adminData="adminData"
+          :field="field[0]"
+          :label="label[0]"
+          :labelButton="labelButton[0]"
+          :classButton="classButton[0]"
+          :colorButton="colorButton[0]"
+          @botones1="creacionEmpresa_dian(adminData.id)"
+          @botones2="enterpriseUpdating(adminData.id)"
+          >
+          <template slot="footerBtn1">
+            <p>¿Crear la empresa seleccionada en el sistema DIAN?</p>
+          </template>
+          <template slot="footerBtn2">
+            <p>¿Actualizar empresa en el sistema DIAN?</p>
+          </template>
+          </info-component>
 
-          <h5>Software</h5>
-          <div class="row q-col-gutter-md">
-            <div class="col-3">
-              <p class="parrafoLabel">Software ID</p>
-              <p>{{ adminData.software_id}}</p>
-            </div>
-            <div class="col-3">
-              <p class="parrafoLabel">Software PIN</p>
-              <p>{{ adminData.software_pin}}</p>
-            </div>
-            <div class="col-3">
-              <p class="parrafoLabel">Software URL</p>
-              <p>{{ adminData.software_url}}</p>
-            </div>
-            <div class="col-3">
-              <p class="parrafoLabel">Respuesta del software</p>
-              <p>{{ adminData.last_software_response = 'Aun sin respuesta'}}</p>
-            </div>
-            <div class="col-2">
-              <q-btn class="q-ml-xs btn-limon" @click="softInfo(adminData.id)">Subir información</q-btn>
-            </div>
-            <p>Verifique que la información es correcta antes de subirla</p>
-          </div>
-          <h5>Certificado</h5>
-          <div class="row q-col-gutter-md">
-            <div class="col-3">
-              <p class="parrafoLabel">Certificado</p>
-              <p>{{ adminData.certificate}}</p>
-            </div>
-            <div class="col-3">
-              <p class="parrafoLabel">Contraseña del certificado</p>
-              <p>{{ adminData.certificate_password}}</p>
-            </div>
-            <div class="col-3">
-              <p class="parrafoLabel">Respuesta del certificado</p>
-              <p>{{ adminData.last_certificate_response}}</p>
-            </div>
-            <div class="col-2">
-              <q-btn
-                class="q-ml-xs"
-                color="cyan-5"
-                @click="certificateUp(adminData.id)"
-              >Subir certificado</q-btn>
-            </div>
-          </div>
+          <info-component
+          :title="title[1]"
+          :adminData="adminData"
+          :field="field[1]"
+          :label="label[1]"
+          :labelButton="labelButton[1]"
+          :classButton="classButton[1]"
+          :colorButton="colorButton[1]"
+          @botones1="softInfo(adminData.id)"
+          >
+          <template slot="footerBtn1">
+            <p></p>
+          </template>
+          </info-component>
+
+          <info-component
+          :title="title[2]"
+          :adminData="adminData"
+          :field="field[2]"
+          :label="label[2]"
+          :labelButton="labelButton[2]"
+          :classButton="classButton[2]"
+          :colorButton="colorButton[2]"
+          @botones1="certificateUp(adminData.id)"
+          >
+          <template slot="footerBtn1">
+            <p></p>
+          </template>
+          </info-component>
         </div>
+
         <div class="column q-col-gutter-md items-center">
           <div class="col-md-auto q-pa-md overflow-auto" style="height: 500px">
             <q-btn class="q-ml-xs btn-limon" @click="productionNumbers(adminData.id)">Ver numeros de produccion</q-btn>
@@ -129,6 +132,7 @@
 
 <script>
 import { globalFunctions } from 'boot/mixins.js'
+import InfoComponent from 'src/components/InfoComponent.vue'
 // import { ref } from 'vue'
 // import { mapState } from "vuex"
 
@@ -136,6 +140,9 @@ const axios = require('axios')
 
 export default {
   name: 'adminEnterprises',
+  components: {
+    InfoComponent
+  },
   created: function () {
     this.globalGetForSelect('api/enterprises/admin/adminEnterprises', 'options')
   },
@@ -159,9 +166,39 @@ export default {
       resolutionData: [{ mensaje: 'No se han requerido numeros de producción' }],
       checkedResolution: [{ mensaje: 'Sin resultados de resolucion' }],
       resolutionResponse: [],
-      adminData: 'null',
       options: null,
-      resolutionDocOption: ['Factura', 'NC', 'ND']
+      resolutionDocOption: ['Factura', 'NC', 'ND'],
+      adminData: 'null',
+      // componente cuadro de información
+      // ----- titulos y cabecera ----- //
+      title: ['Datos empresa', 'Software', 'Certificado'],
+      // ----- parrafo y cuerpo ----- //
+      label: [
+        ['Nombre de la empresa', 'Tipo de documento', 'NIT', 'Dirección', 'Municipalidad', 'Telefono', 'Correo electronico', 'Documento del representante'],
+        ['Software ID', 'Software PIN', 'Software URL', 'Respuesta del software'],
+        ['Certificado', 'Contraseña del certificado', 'Respuesta del certificado']
+      ],
+      field: [
+        ['business_name', 'type_document_identification_id', 'nit', 'address', 'municipality_id', 'phone', 'email', 'ceo_document'],
+        ['software_id', 'software_pin', 'software_url', 'last_software_response'],
+        ['certificate', 'certificate_password', 'last_certificate_response']
+      ],
+      // ----- botones y pie de pagina ----- //
+      colorButton: [
+        ['orange-5', 'orange-5'],
+        ['orange-5'],
+        ['orange-5']
+      ],
+      classButton: [
+        ['q-ml-xs', 'q-ml-xs'],
+        ['q-ml-xs'],
+        ['q-ml-xs']
+      ],
+      labelButton: [
+        ['Crear empresa', 'Actualizar DIAN'],
+        ['Subir información'],
+        ['Subir certificado']
+      ]
     }
   },
   mixins: [globalFunctions],
@@ -191,7 +228,8 @@ export default {
       }
     },
     async creacionEmpresa_dian (id) {
-      console.log(id)
+      // console.log(id)
+      // console.log(this.adminData)
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
@@ -317,8 +355,4 @@ export default {
 </script>
 
 <style scoped>
-.parrafoLabel {
-  font-size: 15px;
-  font-weight: bold;
-}
 </style>
