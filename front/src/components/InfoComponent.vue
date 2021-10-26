@@ -1,26 +1,34 @@
 <template>
   <div class="q-ml-md row items-start">
-    <div class="row items-center">
-      <div class="q-mx-md col-12">
-        <h5>{{title}}</h5>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-4" v-for="(item, key) in outputText" :key="key">
-        <p class="parrafoLabel">{{item.label}}</p>
-        <p>{{ item.parrafo }}</p>
-      </div>
-    </div>
-    <div v-if="outputButton.length > 0" class="row">
-      <div class="col-5 q-ml-md q-pa-lg" v-for="(item, key) in outputButton" :key="key" >
-        <q-btn
-          :class="item.clase"
-          :color="item.color"
-          @click="$emit('botones' + (key + 1))"
-          :label="item.label"
-        />
-        <slot :name="'footerBtn' + (key + 1)" ></slot>
-      </div>
+    <div class="q-gutter-y-md" style="max-width: 600px">
+      <q-card>
+        <q-tabs>
+          <q-tab name="" label="hola" />
+        </q-tabs>
+        <q-separator />
+        <q-tab-panels>
+          <q-tab-panel >
+            <div class="q-mx-md col-12"><h5>{{title}}</h5></div>
+            <div class="row">
+              <div class="col-4" v-for="(item, key) in outputText" :key="key">
+                <p class="parrafoLabel">{{item.label}}</p>
+                <p>{{ item.parrafo }}</p>
+              </div>
+            </div>
+            <div v-if="outputButton.length > 0" class="row">
+              <div class="col-5 q-ml-md q-pa-lg" v-for="(item, key) in outputButton" :key="key" >
+                <q-btn
+                  :class="item.clase"
+                  :color="item.color"
+                  @click="$emit('botones' + (key + 1))"
+                  :label="item.label"
+                />
+                <slot :name="'footerBtn' + (key + 1)" ></slot>
+              </div>
+            </div>
+          </q-tab-panel>
+        </q-tab-panels>
+      </q-card>
     </div>
   </div>
 </template>
