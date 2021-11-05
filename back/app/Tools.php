@@ -75,7 +75,7 @@ class Tools extends Model
         return $response;
     }
 
-    public static function filterApi ($url, $fieldsToFilter, $structureToFilter) 
+    public static function filterApi ($url, $fieldsToFilter, $structureToFilter)
     {
         $datos = Tools::http_get($url);
         $arrayBuckets = array();
@@ -87,11 +87,18 @@ class Tools extends Model
                 foreach($fieldsToFilter as $field){
                     $newItems[$field] = $item[$field];
                 }
-                
+
                 $arrayBuckets[$v][] = $newItems;
             }
         }
         return $arrayBuckets;
+    }
+
+        public static function toCollect($collect){
+        $details = collect($collect)->map(function ($item) {
+            return (object) $item;
+        });
+        return $details;
     }
 
     public static function curlTest ()

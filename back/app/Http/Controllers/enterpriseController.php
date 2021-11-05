@@ -27,11 +27,10 @@ class enterpriseController extends Controller
     public function adminIndex() {
         $arrayBuckets = array();
         $index = enterprise::all()->toArray();
-
         foreach ($index as $key => $value) {
             $arr = array();
             foreach ($value as $key2 => $value2) {
-                if ($key2 === 'business_name' || $key2 === 'nit' ) {
+                if ($key2 === 'business_name' || $key2 === 'nit' || $key2 === 'id') {
                     array_push($arr, $value2);
                 }
             }
@@ -99,6 +98,7 @@ class enterpriseController extends Controller
     {
         $nuevaEmpresa = new enterprise ($request->all());
         $nuevaEmpresa->save();
+        // $tipo = enterprise::find();
         return 'done';
 
     }
@@ -127,11 +127,15 @@ class enterpriseController extends Controller
 
         $response = Tools::http_post($urlPost, $data, $authorization);
 
-        $enterprise->token = $response; // validar sin errores para no introducir en bd el error
-
-        $enterprise->save();
-
-        return $response;
+        if ( preg_match('/{"message":"The given data was invalid.",/', $response) === 1 ) {
+            $enterprise->token = null;
+            $enterprise->save();
+            return 0; // no se pudo crear
+        } else if (preg_match('/{"message":"The given data was invalid.",/', $response) === 0) {
+            $enterprise->token = $response;
+            $enterprise->save();
+            return 1; // el token fue creado y guardado en BD
+        }
     }
 
     public function softInfo($id)
@@ -203,9 +207,10 @@ class enterpriseController extends Controller
         return $index = $enterprise->find($id);
     }
 
-    public function showAdmin($nit)
+    public function showAdmin($id)
     {
-        return enterprise::where('nit', '=', $nit)->get()->first();
+        $empresa = enterprise::where('id', '=', $id)->get()->first();
+        return $empresa;
     }
 
     /**

@@ -82,6 +82,8 @@ module.exports = function (ctx) {
         'QBtnToggle',
         'QTabs',
         'QTab',
+        'QTabPanels',
+        'QTabPanel',
         'QBtnDropdown'
         // 'QResponsive' <----------consultar componente
       ],

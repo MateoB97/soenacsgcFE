@@ -1,46 +1,43 @@
 <template>
   <div class="q-ml-md row items-start">
     <div class="q-gutter-y-md" style="max-width: 600px">
-      <q-card>
-        <q-tabs>
-          <q-tab name="" label="hola" />
-        </q-tabs>
-        <q-separator />
-        <q-tab-panels>
-          <q-tab-panel >
-            <div class="q-mx-md col-12"><h5>{{title}}</h5></div>
-            <div class="row">
-              <div class="col-4" v-for="(item, key) in outputText" :key="key">
-                <p class="parrafoLabel">{{item.label}}</p>
-                <p>{{ item.parrafo }}</p>
-              </div>
-            </div>
-            <div v-if="outputButton.length > 0" class="row">
-              <div class="col-5 q-ml-md q-pa-lg" v-for="(item, key) in outputButton" :key="key" >
-                <q-btn
-                  :class="item.clase"
-                  :color="item.color"
-                  @click="$emit('botones' + (key + 1))"
-                  :label="item.label"
-                />
-                <slot :name="'footerBtn' + (key + 1)" ></slot>
-              </div>
-            </div>
-          </q-tab-panel>
-        </q-tab-panels>
-      </q-card>
+      <div class="q-mx-md col-12"><h5>{{title}}</h5></div>
+      <div class="row">
+        <div class="col-4" v-for="(itemText, key) in outputText" :key="key + 'text'">
+          <p class="parrafoLabel">{{itemText.label}}</p>
+          <p>{{ itemText.parrafo }}</p>
+        </div>
+      </div>
+      <div v-if="outputButton.length > 0" class="row">
+        <div class="col-5 q-ml-md q-pa-lg" v-for="(itemBut, key) in outputButton" :key="key + 'button'" >
+          <div v-if="adminData.confirm[key] === true">
+            <q-btn
+              :class="itemBut.clase"
+              :color="itemBut.color"
+              :clicked="itemBut.methodButton"
+              @click="$emit('update:botones', $event.target.clicked), methodCompro()"
+              :label="itemBut.label"
+            />
+            <slot :name="'footerBtn' + (key + 1)" ></slot>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+// import ButtonComponent from './ButtonComponent.vue'
+
 export default {
+  // components: { ButtonComponent },
   name: 'InfoComponent',
-  data: () => ({
+  data: function () {
+    return {
 
-  }),
+    }
+  },
   methods: {
-
   },
   computed: {
     // estructura de parrafos
@@ -63,18 +60,26 @@ export default {
     // estructura de botones
     outputButton () {
       let output = []
-      let lista = [this.classButton.length, this.colorButton.length, this.labelButton.length]
+      let lista = [this.classButton.length, this.colorButton.length, this.labelButton.length, Object.keys(this.methodButton).length]
       lista.sort((a, b) => a - b)
       let tamaño = lista.slice(-1)
       for (let i = 0; i < tamaño; i++) {
         let boton = {}
+        let indexMethod = Object.keys(this.methodButton)[i]
+        boton.methodButton = this.methodButton[indexMethod]
         boton.label = this.labelButton[i]
         boton.color = this.colorButton[i]
         boton.clase = this.classButton[i]
         output.push(boton)
       }
+      // console.log(this.methodButton)
+      // console.log(output)
       return output
     }
+  },
+  model: {
+    prop: 'clicked',
+    event: 'botones'
   },
   props: {
     // información de api
@@ -107,6 +112,10 @@ export default {
     labelButton: {
       type: Array,
       default: () => []
+    },
+    methodButton: {
+      type: Object,
+      default: () => {}
     }
   }
 }
