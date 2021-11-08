@@ -8,20 +8,6 @@
           <p>{{ itemText.parrafo }}</p>
         </div>
       </div>
-      <div v-if="outputButton.length > 0" class="row">
-        <div class="col-5 q-ml-md q-pa-lg" v-for="(itemBut, key) in outputButton" :key="key + 'button'" >
-          <div v-if="adminData.confirm[key] === true">
-            <q-btn
-              :class="itemBut.clase"
-              :color="itemBut.color"
-              :clicked="itemBut.methodButton"
-              @click="$emit('update:botones', $event.target.clicked), methodCompro()"
-              :label="itemBut.label"
-            />
-            <slot :name="'footerBtn' + (key + 1)" ></slot>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -56,25 +42,6 @@ export default {
         output.push(agregar)
       }
       return output
-    },
-    // estructura de botones
-    outputButton () {
-      let output = []
-      let lista = [this.classButton.length, this.colorButton.length, this.labelButton.length, Object.keys(this.methodButton).length]
-      lista.sort((a, b) => a - b)
-      let tamaño = lista.slice(-1)
-      for (let i = 0; i < tamaño; i++) {
-        let boton = {}
-        let indexMethod = Object.keys(this.methodButton)[i]
-        boton.methodButton = this.methodButton[indexMethod]
-        boton.label = this.labelButton[i]
-        boton.color = this.colorButton[i]
-        boton.clase = this.classButton[i]
-        output.push(boton)
-      }
-      // console.log(this.methodButton)
-      // console.log(output)
-      return output
     }
   },
   model: {
@@ -99,23 +66,6 @@ export default {
     label: {
       type: Array,
       default: () => []
-    },
-    // props botones y pie
-    classButton: {
-      type: Array,
-      default: () => []
-    },
-    colorButton: {
-      type: Array,
-      default: () => []
-    },
-    labelButton: {
-      type: Array,
-      default: () => []
-    },
-    methodButton: {
-      type: Object,
-      default: () => {}
     }
   }
 }

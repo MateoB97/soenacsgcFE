@@ -38,72 +38,125 @@
               </q-tabs>
               <q-separator />
               <q-tab-panels v-model="tab" animated>
-                <q-tab-panel v-for="(itemTitle, keyTitle) in title" :key="keyTitle + 'title'" :name="itemTitle" style="max-width: 600px" >
+                <q-tab-panel name="Datos empresa" style="max-width: 600px" >
                   <info-component
-                  :title="title[keyTitle]"
+                  :title="title[0]"
                   :adminData="adminData"
-                  :field="field[keyTitle]"
-                  :label="label[keyTitle]"
-                  :labelButton="labelButton[keyTitle]"
-                  :classButton="classButton[keyTitle]"
-                  :colorButton="colorButton[keyTitle]"
-                  :methodButton="methodButton[keyTitle]"
-                  :botones.sync="botones"
+                  :field="field[0]"
+                  :label="label[0]"
                   >
-                  <template slot="footerBtn1">
-                    <p>¿Crear la empresa seleccionada en el sistema DIAN?</p>
-                  </template>
-                  <template slot="footerBtn2">
-                    <p>¿Actualizar empresa en el sistema DIAN?</p>
-                  </template>
                   </info-component>
+                  <div class="row" v-if="adminData.confirm === true">
+                    <div class="col-5 q-ml-md q-pa-lg" >
+                      <q-btn
+                        class="q-ml-xs"
+                        color="light-green-5"
+                        @click="creacionEmpresa_dian(this.adminData.id)"
+                        label="Crear empresa"
+                      />
+                      <p>¿Crear la empresa seleccionada en el sistema DIAN?</p>
+                    </div>
+                    <div class="col-5 q-ml-md q-pa-lg" >
+                      <q-btn
+                        class="q-ml-xs"
+                        color="orange-5"
+                        @click="enterpriseUpdating(this.adminData.id)"
+                        label="Actualizar DIAN"
+                      />
+                      <p>¿Actualizar empresa en el sistema DIAN?</p>
+                    </div>
+                  </div>
+                </q-tab-panel>
+                <q-tab-panel name="Software" style="max-width: 600px" >
+                  <info-component
+                  :title="title[1]"
+                  :adminData="adminData"
+                  :field="field[1]"
+                  :label="label[1]"
+                  >
+                  </info-component>
+                  <div class="row" v-if="adminData.confirm === true">
+                    <div class="col-5 q-ml-md q-pa-lg" >
+                      <q-btn
+                        class="q-ml-xs"
+                        color="orange-5"
+                        @click="softInfo(this.adminData.id)"
+                        label="Subir información"
+                      />
+                      <p>¿Confirmar datos del software?</p>
+                    </div>
+                  </div>
+                </q-tab-panel>
+                <q-tab-panel name="Certificado" style="max-width: 600px" >
+                  <info-component
+                  :title="title[2]"
+                  :adminData="adminData"
+                  :field="field[2]"
+                  :label="label[2]"
+                  >
+                  </info-component>
+                  <div class="row" v-if="adminData.confirm === true">
+                    <div class="col-5 q-ml-md q-pa-lg" >
+                      <q-btn
+                        class="q-ml-xs"
+                        color="orange-5"
+                        @click="certificateUp(this.adminData.id)"
+                        label="Subir certificado"
+                      />
+                      <p>¿Crear certificado?</p>
+                    </div>
+                  </div>
                 </q-tab-panel>
               </q-tab-panels>
             </q-card>
           </div>
         </div>
         <div class="col-shrink no-wrap q-mx-md q-my-md q-col-gutter-md items-center justify-center content-center">
-          <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="productionNumbers(adminData.id), alertDiag = true">Ver numeros de produccion</q-btn></div>
-          <q-dialog v-model="alertDiag">
-            <q-card class="col-md-auto q-px-md overflow-auto justify-center" style="max-height: 600px; max-width: 800px">
-              <q-card-section>
-                <div class="text-h5">Numeros de producción</div>
-              </q-card-section>
-              <q-card-section class="justify-center content-center q-pa-md" style="width: 800px">
-                <q-list dense bordered padding class="q-mx-xl rounded-borders" style="width: 700px; height: 550px" v-for = "(item, key) in resolutionData" :key="item.id">
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)">
-                    <q-item-section class="col-12" style="max-width: 650px">
-                      <div class="col-md-auto " style="width: 550px" v-for = "(items, claves) in item" :key="items.id">
-                        {{claves}} : {{items}}
-                      </div>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-card-section>
-              <q-card-actions>
-                <q-btn class="q-mx-xl btn-limon">FC</q-btn>
-                <q-btn class="q-mx-xl btn-limon">NC</q-btn>
-                <q-btn class="q-mx-xl btn-limon">ND</q-btn>
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
-
-        <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl" color="teal-5" style="width: 700px" @click="resolutions()">Ver resoluciones</q-btn></div>
-          <div class="col-md-auto q-px-md overflow-auto justify-center" style="max-height: 600px; max-width: 800px">
-            <div class="justify-center content-center q-pa-md" style="width: 600px">
-              <q-item-label class="q-mx-xl " header>Resultados de resolucion</q-item-label>
-              <q-list dense bordered padding class="q-mx-xl rounded-borders"  style="width: 700px; height: 550px">
-                <q-item tag="label" v-ripple>
-                    <q-item-section class="col-12" style="max-width: 650px">
-                      <div class="col-md-auto " style="width: 550px" v-for = "(items, claves) in resolutionResponse" :key="items.id">
-                        {{claves}} : {{items}}
-                      </div>
-                    </q-item-section>
-                </q-item>
-              </q-list>
-            </div>
+          <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="productionNumbers(adminData.id), Diag1 = true">Ver numeros de produccion</q-btn></div>
+            <q-dialog v-model="Diag1">
+              <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+                <q-card-section class="justify-center q-pa-md">
+                  <div class="text-h5 absolute-center q-mx-md">Prefijos</div>
+                </q-card-section>
+                <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
+                  <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
+                    <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length > 1 ">
+                      <q-item-section class="col-12" style="max-width: 650px">
+                        {{item.Prefix}} : {{item.ResolutionNumber}}
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length < 1">
+                      <q-item-section class="col-12" style="max-width: 650px">
+                        {{item.mensaje}}
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card-section>
+                <q-card-actions class="justify-center">
+                  <q-btn @click="selectDocResolution('FC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">FC</q-btn>
+                  <q-btn @click="selectDocResolution('NC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">NC</q-btn>
+                  <q-btn @click="selectDocResolution('ND')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">ND</q-btn>
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+            <q-dialog v-model="Diag2">
+              <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+                <q-card-section class="row items-center q-pb-none">
+                  <q-space />
+                  <q-btn icon="close" flat round dense v-close-popup />
+                </q-card-section>
+                <q-card-section class="justify-center q-pa-md">
+                  <div class="text-h5 absolute-center q-mx-md">Info de la resolución</div>
+                </q-card-section>
+                <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 600px">
+                  {{resolutionResponse}}
+                </q-card-section>
+                <q-card-actions class="relative-position justify-center q-pa-md">
+                  <q-btn @click="downloadTxt()" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
           </div>
-        </div>
       </div>
     </q-page>
   </div>
@@ -124,12 +177,10 @@ export default {
   },
   created: function () {
     this.globalGetForSelect('api/enterprises/admin/adminEnterprises', 'options')
-    console.log('hola')
   },
   mounted: function () {
   },
   beforeUpdate: function () {
-    console.log(this.methodButton)
     // console.log(this.adminData)
   },
   updated: function () {
@@ -137,19 +188,25 @@ export default {
   data: function () {
     return {
       urlAPI: 'api/enterprises',
+      // select principal
       selectData: {
       },
+      // datos principales
+      adminData: 'null',
       selectDocRes: {
       },
       storeItems: {
       },
-      resolutionData: [{ mensaje: 'No se han requerido numeros de producción' }],
-      checkedResolution: [{ mensaje: 'Sin resultados de resolucion' }],
-      resolutionResponse: [],
       options: null,
-      alertDiag: false,
-      resolutionDocOption: ['Factura', 'NC', 'ND'],
-      adminData: 'null',
+      // Cuadros de dialogo
+      Diag1: false,
+      Diag2: false,
+      // datos de la resoulucion
+      resolutionData: [{ mensaje: 'No se han requerido numeros de producción' }],
+      checkedResolution: [],
+      resolutionDocOption: false,
+      resolutionResponse: {},
+      oldPrefix: '',
       // -- tabs -- //
       tab: 'info',
       // componente cuadro de información
@@ -165,83 +222,7 @@ export default {
         ['business_name', 'type_document_identification_id', 'nit', 'address', 'municipality_id', 'phone', 'email', 'ceo_document', 'type_environments'],
         ['software_id', 'software_pin', 'software_url', 'last_software_response'],
         ['certificate', 'certificate_password', 'last_certificate_response']
-      ],
-      // ----- botones y pie de pagina ----- //
-      colorButton: [
-        ['light-green-5', 'orange-5'],
-        ['orange-5'],
-        ['orange-5']
-      ],
-      classButton: [
-        ['q-ml-xs', 'q-ml-xs'],
-        ['q-ml-xs'],
-        ['q-ml-xs']
-      ],
-      labelButton: [
-        ['Crear empresa', 'Actualizar DIAN'],
-        ['Subir información'],
-        ['Subir certificado']
-      ],
-      methodButton: [
-        {
-          creacionEmpresa_dian: (function (id) { // boton creacion empresa
-            // console.log('hola create')
-            this.$q.loading.show()
-            try {
-              let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
-              console.log(data.data)
-            } catch (error) {
-              console.log(error)
-            } finally {
-              this.$q.loading.hide()
-            }
-          }(this.adminData.id)),
-          enterpriseUpdating: (function (id) { // boton actualizar empresa
-            // console.log('hola update')
-            this.$q.loading.show()
-            try {
-              let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
-              console.log(data)
-            } catch (error) {
-              console.log(error)
-            } finally {
-              this.$q.loading.hide()
-            }
-          }(this.adminData.id))
-        },
-        {
-          softInfo: (function (id) { // boton soft id
-            this.$q.loading.show()
-            try {
-              let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
-              if (data.mensaje === 'Respuesta de software positiva') {
-                this.adminData.last_software_response = data.response
-              } else if (data.mensaje === 'Respuesta de software negativa') {
-                this.adminData.last_software_response = 'Aun sin respuesta'
-              }
-              console.log(data)
-            } catch (error) {
-              console.log(error)
-            } finally {
-              this.$q.loading.hide()
-            }
-          }(this.adminData.id))
-        },
-        {
-          certificateUp: (function (id) { // boton certificado
-            this.$q.loading.show()
-            try {
-              let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
-              console.log(data)
-            } catch (error) {
-              console.log(error)
-            } finally {
-              this.$q.loading.hide()
-            }
-          }(this.adminData.id))
-        }
-      ],
-      botones: 'hola'
+      ]
     }
   },
   mixins: [globalFunctions],
@@ -253,8 +234,65 @@ export default {
     postEdit () {
     },
     checkResolution (id) {
-      this.checkedResolution[0] = this.resolutionData[id]
-      console.log(Object.keys(this.checkedResolution[0]).length)
+      this.checkedResolution = this.resolutionData[id]
+      this.oldPrefix = this.checkedResolution.Prefix
+      // console.log(this.oldPrefix)
+      this.resolutionDocOption = true
+    },
+    // boton creacion empresa
+    creacionEmpresa_dian (id) {
+      // console.log('hola create')
+      this.$q.loading.show()
+      try {
+        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
+        console.log(data.data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // boton actualizar empresa
+    enterpriseUpdating (id) {
+      // console.log('hola update')
+      this.$q.loading.show()
+      try {
+        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // boton soft id
+    softInfo (id) {
+      this.$q.loading.show()
+      try {
+        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
+        if (data.mensaje === 'Respuesta de software positiva') {
+          this.adminData.last_software_response = data.response
+        } else if (data.mensaje === 'Respuesta de software negativa') {
+          this.adminData.last_software_response = 'Aun sin respuesta'
+        }
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // boton certificado
+    certificateUp (id) {
+      this.$q.loading.show()
+      try {
+        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
     },
     // select input datos de empresa
     async selectDataEnterprise () {
@@ -293,14 +331,10 @@ export default {
         for (let i = 0; i < result.length; i++) {
           dataBd.data[matchInput[i]] = result[i].name
         }
-        dataBd.data.confirm = []
-        for (let i = 0; i < this.labelButton.length; i++) {
-          dataBd.data.confirm[i] = []
-          if (dataBd.data.token !== null) {
-            dataBd.data.confirm[i] = true
-          } else {
-            dataBd.data.confirm[i] = false
-          }
+        if (dataBd.data.token !== null) {
+          dataBd.data.confirm = true
+        } else {
+          dataBd.data.confirm = false
         }
         this.adminData = dataBd.data // ingreso datos a la vista
       } catch (error) {
@@ -309,60 +343,94 @@ export default {
         this.$q.loading.hide()
       }
     },
-    // boton resoluciones
+    // información resoluciones
     async resolutions () {
       this.$q.loading.show()
       try {
         let request = this.checkedResolution
-        console.log(request)
+        request.id = this.adminData.id
         let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
         console.log(data)
+        // verificar el data
+        // if (data) {
+        //   this.$q.notify({
+        //     message: 'Error',
+        //     color: 'red'
+        //   })
+        // } else if (data) {
+        //   this.$q.notify({
+        //     message: 'Exito',
+        //     color: 'green'
+        //   })
+        // }
+        this.resolutionResponse = data
+        // if (data) { // falta saber como se recibe la data
+        //   this.Diag2 = true
+        // }
+        this.Diag2 = true
       } catch (error) {
         console.log(error)
       } finally {
         this.$q.loading.hide()
       }
     },
+    // boton de descarga información resoluciones
+    downloadTxt () {
+
+    },
+    // boton numeros de producción
     async productionNumbers (id) {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/productionNumbers' + '/' + id)
-        let response = data.data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
-        if (typeof response === 'undefined') {
-          this.resolutionData[0] = { mensaje: 'No se han encontrado numeros de producción' }
-        } else if (typeof response === 'object') {
-          this.resolutionData = response
+        console.log(data)
+        if (data.data.message === 'Server Error') {
+          this.$q.notify({
+            message: 'Error del servidor',
+            color: 'red'
+          })
+          this.resolutionData[0].mensaje = 'Error del servidor'
+        } else {
+          let response = data.data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
+          console.log(response)
+          if (typeof response === 'undefined') {
+            this.resolutionData[0].mensaje = 'No se han encontrado numeros de producción'
+          } else if (typeof response === 'object') {
+            this.resolutionData = response
+          }
         }
-        // console.log(typeof resolutionData)
-        // console.log(this.resolutionData)
       } catch (error) {
         console.log(error)
       } finally {
         this.$q.loading.hide()
       }
     },
-    selectDocResolution () {
-      switch (this.selectDocRes) {
-        case 'Factura':
-
-          this.checkedResolution[0].type_document_id = 1
+    selectDocResolution (doc) {
+      // console.log(this.oldPrefix)
+      switch (doc) {
+        case 'FC':
+          this.checkedResolution.type_document_id = 1
+          console.log(this.checkedResolution)
+          this.checkedResolution.Prefix = this.oldPrefix
+          this.resolutions()
           break
         case 'NC':
-          this.checkedResolution[0].type_document_id = 5
-          let newPrefix1
-          let oldPrefix1 = this.checkedResolution[0].Prefix
-          newPrefix1 = oldPrefix1.slice(0, -2) + 'NC'
-          this.checkedResolution[0].Prefix = newPrefix1
+          this.checkedResolution.type_document_id = 5
+          let newPrefix2
+          let oldPrefix2 = this.checkedResolution.Prefix
+          this.oldPrefix = oldPrefix2
+          newPrefix2 = oldPrefix2.slice(0, -2) + 'NC'
+          this.checkedResolution.Prefix = newPrefix2
           break
         case 'ND':
-          this.checkedResolution[0].type_document_id = 6
-          let newPrefix2
-          let oldPrefix2 = this.checkedResolution[0].Prefix
-          newPrefix2 = oldPrefix2.slice(0, -2) + 'ND'
-          this.checkedResolution[0].Prefix = newPrefix2
+          this.checkedResolution.type_document_id = 6
+          let newPrefix3
+          let oldPrefix3 = this.checkedResolution.Prefix
+          this.oldPrefix = oldPrefix3
+          newPrefix3 = oldPrefix3.slice(0, -2) + 'ND'
+          this.checkedResolution.Prefix = newPrefix3
           break
       }
-      // console.log(this.checkedResolution)
     }
   },
   computed: {

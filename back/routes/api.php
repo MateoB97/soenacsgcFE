@@ -73,7 +73,7 @@ Route::group(['prefix' => 'users'], function(){
     Route::apiResource('permisos/roles', 'UserRolesController');
     Route::get('permisos/permisos-rol', 'UserPermisosController@permisosPorRol');
     Route::get('permisos/permisos-agrupados-categorias', 'UserPermisosController@permisosAgrupadosCategorias');
-}); 
+});
 
 // Route::group(['prefix' => 'enterprises'], function(){
 //     //Enterprises
@@ -90,8 +90,10 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
     Route::get('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::get('enterprises/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
+    Route::get('enterprises/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
     Route::post('enterprises/soenac/resolutions/{request}', 'enterpriseController@resolutions');
     Route::post('enterprises', 'enterpriseController@store');
+
     Route::put('enterprises/{id}', 'enterpriseController@update');
     Route::put('enterprises/certificateUp/{id}', 'enterpriseController@certificateUp');
     Route::put('enterprises/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
@@ -99,9 +101,9 @@ Route::group(['prefix' => 'users'], function(){
 
     Route::get('/generals', 'generalController@index');
     Route::post('/generals', 'generalController@store');
-    
+
 
     Route::get('testing', 'enterpriseController@testing');
 
 
-    
+

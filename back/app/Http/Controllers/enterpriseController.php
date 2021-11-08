@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class enterpriseController extends Controller
 {
@@ -52,17 +53,20 @@ class enterpriseController extends Controller
 
     public function resolutions($request) {
 
+        $enterprise = enterprise::find($request->id);
+        $general = general::all()->first();
+
         $resolutionData = array();
 
-        $resolutionData['type_document_id'] = 1;
-        $resolutionData['from'] = 990000000;
-        $resolutionData['to'] = 995000000;
-        $resolutionData['resolution'] = 18760000001;
-        $resolutionData['resolution_date'] = "0001-01-01";
-        $resolutionData['technical_key'] = "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c";
-        $resolutionData['date_from'] = "2019-01-19";
-        $resolutionData['date_to'] = "2030-01-19";
-        $resolutionData['prefix'] = "SETP";
+        $resolutionData['type_document_id']  = intval($request->type_document_id);
+        $resolutionData['from']              = intval($request->FromNumber);
+        $resolutionData['to']                = intval($request->ToNumber);
+        $resolutionData['resolution']        = intval($request->ResolutionNumber);
+        $resolutionData['resolution_date']   = $request->ResolutionDate;
+        $resolutionData['technical_key']     = $request->TechnicalKey;
+        $resolutionData['date_from']         = $request->ValidDateFrom;
+        $resolutionData['date_to']           = $request->ValidDateTo;
+        $resolutionData['prefix']            = $request->Prefix;
 
         $url = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
 
@@ -72,9 +76,20 @@ class enterpriseController extends Controller
             $authorization = "Authorization: Bearer ". $enterprise->token;
         }
 
-        $datos = Tools::http_post($url, $resolutionData, $authorization);
-
         return json_encode($datos);
+    }
+
+    public function downloadTxt ($id) {
+        $enterprise = enterprise::find($id);
+
+        $content = 'Nombre: '.$enterprise->business_name.'\n'.'Token: '.$enterprise->toke.'\n'.
+        'Tipo de documento: '.
+        Storage::disk('local')->put('resolution'.intval($request->ResolutionNumber).'.txt',);
+
+        // $datos = Tools::http_post($url, $resolutionData, $authorization);
+        // $file = fopen('resolution'.intval($request->ResolutionNumber).'.txt', 'a');
+        // fwrite($file, $enterprise->business_name);
+
     }
 
     /**
@@ -141,6 +156,7 @@ class enterpriseController extends Controller
     public function softInfo($id)
     {
         $enterprise = enterprise::find($id);
+        $general = general::all()->first();
 
         $data = array();
 
@@ -177,7 +193,6 @@ class enterpriseController extends Controller
     {
         $enterprise = enterprise::find($id);
         $general = general::all()->first();
-
         $data = array();
         $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/numbering/range' . '/' . $enterprise->nit . '/' . $enterprise->nit . '/' . $enterprise->software_id;
 
@@ -188,11 +203,7 @@ class enterpriseController extends Controller
         }
 
         $datos = Tools::http_post($urlPost, $data, $authorization);
-        // dd(json_decode($datos));
-        // json_encode($datos);
-        // // $response = $datos['data']['responseDian']['Envelope']['Body']['GetNumberingRangeResponse']['GetNumberingRangeResult']['ResponseList'];
-        // $response = $datos->data->responseDian->Envelope->Body->GetNumberingRangeResponse->GetNumberingRangeResult->ResponseList;
-        // dd($response);
+
         return $datos;
     }
 
