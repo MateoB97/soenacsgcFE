@@ -11,16 +11,25 @@ class Tools extends Model
 		return 'Y-d-m H:i:s.v';
 	}
 
-    public static function  http_get($url){
+    public static function  http_get($url, $authorization = false){
 
         $ch = curl_init();
 
-        $curlConfig = [
-            CURLOPT_URL            => $url,
-            CURLOPT_CUSTOMREQUEST  => "GET",
-            CURLOPT_RETURNTRANSFER => true
-        ];
-
+        if ($authorization === false) {
+            $curlConfig = [
+                CURLOPT_URL            => $url,
+                CURLOPT_CUSTOMREQUEST  => "GET",
+                CURLOPT_RETURNTRANSFER => true
+            ];
+        } else if ($authorization !== false) {
+            $curlConfig = [
+                CURLOPT_URL            => $url,
+                CURLOPT_CUSTOMREQUEST  => "GET",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => TRUE,
+                CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization)
+            ];
+        }
         curl_setopt_array($ch, $curlConfig);
 
         $response = curl_exec($ch);

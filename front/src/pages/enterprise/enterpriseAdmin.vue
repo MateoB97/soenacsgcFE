@@ -113,50 +113,78 @@
         </div>
         <div class="col-shrink no-wrap q-mx-md q-my-md q-col-gutter-md items-center justify-center content-center">
           <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="productionNumbers(adminData.id), Diag1 = true">Ver numeros de produccion</q-btn></div>
-            <q-dialog v-model="Diag1">
-              <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
-                <q-card-section class="justify-center q-pa-md">
-                  <div class="text-h5 absolute-center q-mx-md">Prefijos</div>
-                </q-card-section>
-                <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
-                  <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
-                    <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length > 1 ">
-                      <q-item-section class="col-12" style="max-width: 650px">
-                        {{item.Prefix}} : {{item.ResolutionNumber}}
-                      </q-item-section>
-                    </q-item>
-                    <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length < 1">
-                      <q-item-section class="col-12" style="max-width: 650px">
-                        {{item.mensaje}}
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-card-section>
-                <q-card-actions class="justify-center">
-                  <q-btn @click="selectDocResolution('FC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">FC</q-btn>
-                  <q-btn @click="selectDocResolution('NC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">NC</q-btn>
-                  <q-btn @click="selectDocResolution('ND')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">ND</q-btn>
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
-            <q-dialog v-model="Diag2">
-              <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
-                <q-card-section class="row items-center q-pb-none">
-                  <q-space />
-                  <q-btn icon="close" flat round dense v-close-popup />
-                </q-card-section>
-                <q-card-section class="justify-center q-pa-md">
-                  <div class="text-h5 absolute-center q-mx-md">Info de la resolución</div>
-                </q-card-section>
-                <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 600px">
-                  {{resolutionResponse}}
-                </q-card-section>
-                <q-card-actions class="relative-position justify-center q-pa-md">
-                  <q-btn @click="downloadTxt()" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
-          </div>
+          <div class="col-12" style="max-width: 800px" v-if="adminData.token !== null"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="verEmpresa(adminData.id), Diag3 = true">Ver empresa soenac</q-btn></div>
+          <q-dialog v-model="Diag1">
+            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+              <q-card-section class="justify-center q-pa-md">
+                <div class="text-h5 absolute-center q-mx-md">Prefijos</div>
+              </q-card-section>
+              <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
+                <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
+                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length > 1 ">
+                    <q-item-section class="col-12" style="max-width: 650px">
+                      {{item.Prefix}} : {{item.ResolutionNumber}}
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length < 1">
+                    <q-item-section class="col-12" style="max-width: 650px">
+                      {{item.mensaje}}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+              <q-card-actions class="justify-center">
+                <q-btn @click="selectDocResolution('FC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">FC</q-btn>
+                <q-btn @click="selectDocResolution('NC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">NC</q-btn>
+                <q-btn @click="selectDocResolution('ND')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">ND</q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+          <q-dialog v-model="Diag2">
+            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+              <q-card-section class="row items-center q-pb-none">
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+              </q-card-section>
+              <q-card-section class="justify-center q-pa-md">
+                <div class="text-h5 absolute-center q-mx-md">Info de la resolución</div>
+              </q-card-section>
+              <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 600px">
+                {{resolutionResponse}}
+              </q-card-section>
+              <q-card-actions class="relative-position justify-center q-pa-md">
+                <q-btn @click="downloadTxt()" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+          <q-dialog v-model="Diag3">
+            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+              <q-card-section class="row items-center q-pb-none">
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+              </q-card-section>
+              <q-card-section class="justify-center q-ma-lg q-pa-lg">
+                <div class="text-h5 absolute-center q-ma-sm">Empresa en soenac</div>
+              </q-card-section>
+              <q-card-section class="q-ma-md q-pa-md" style="width: 600px">
+                <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 550px; height: auto" v-if="Object.keys(responseEnterpriseData).length > 1 " >
+                  <q-item tag="label" v-for = "(item, key) in responseEnterpriseData" :key="key">
+                    <q-item-section class="col-12" style="max-width: 550px">
+                      <b>{{key}}</b> {{item}}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+                <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 550px; height: auto" v-if="Object.keys(responseEnterpriseData).length <= 1 " >
+                  <q-item tag="label" v-for = "(item, key) in responseEnterpriseData" :key="key">
+                    <q-item-section class="col-12" style="max-width: 550px">
+                      {{key}} : {{item}}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+            </q-card>
+          </q-dialog>
+        </div>
       </div>
     </q-page>
   </div>
@@ -201,12 +229,15 @@ export default {
       // Cuadros de dialogo
       Diag1: false,
       Diag2: false,
+      Diag3: false,
       // datos de la resoulucion
       resolutionData: [{ mensaje: 'No se han requerido numeros de producción' }],
       checkedResolution: [],
       resolutionDocOption: false,
       resolutionResponse: {},
       oldPrefix: '',
+      // respuesta datos soenac-empresa
+      responseEnterpriseData: { mensaje: '' },
       // -- tabs -- //
       tab: 'info',
       // componente cuadro de información
@@ -376,7 +407,21 @@ export default {
     },
     // boton de descarga información resoluciones
     downloadTxt () {
-
+      this.$q.loading.show()
+      try {
+        let request
+        let resolution = Object.entries(this.resolutionResponse)
+        let admin = Object.entries(this.adminData)
+        let concat = resolution.concat(admin)
+        request = Object.fromEntries(concat)
+        // console.log(request)
+        let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/downloadTxt/' + request)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
     },
     // boton numeros de producción
     async productionNumbers (id) {
@@ -411,7 +456,7 @@ export default {
         case 'FC':
           this.checkedResolution.type_document_id = 1
           console.log(this.checkedResolution)
-          this.checkedResolution.Prefix = this.oldPrefix
+          this.checkedResolution.Prefix = this.oldPrefi
           this.resolutions()
           break
         case 'NC':
@@ -421,6 +466,7 @@ export default {
           this.oldPrefix = oldPrefix2
           newPrefix2 = oldPrefix2.slice(0, -2) + 'NC'
           this.checkedResolution.Prefix = newPrefix2
+          this.resolutions()
           break
         case 'ND':
           this.checkedResolution.type_document_id = 6
@@ -429,7 +475,21 @@ export default {
           this.oldPrefix = oldPrefix3
           newPrefix3 = oldPrefix3.slice(0, -2) + 'ND'
           this.checkedResolution.Prefix = newPrefix3
+          this.resolutions()
           break
+      }
+    },
+    // boton ver empresa soenac
+    async verEmpresa (id) {
+      this.$q.loading.show()
+      try {
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/verEmpresa' + '/' + id)
+        console.log(data)
+        this.responseEnterpriseData = data.data
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
       }
     }
   },

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use stdClass;
 
 class enterpriseController extends Controller
 {
@@ -79,16 +80,48 @@ class enterpriseController extends Controller
         return json_encode($datos);
     }
 
-    public function downloadTxt ($id) {
-        $enterprise = enterprise::find($id);
+    public function downloadTxt ($request) {
 
-        $content = 'Nombre: '.$enterprise->business_name.'\n'.'Token: '.$enterprise->toke.'\n'.
-        'Tipo de documento: '.
-        Storage::disk('local')->put('resolution'.intval($request->ResolutionNumber).'.txt',);
+        switch ($request->type_document_id) {
+            case 1:
+                $request->tipoDocNom = 'Factura';
+                break;
+            case 5:
+                $request->tipoDocNom = 'Nota credito';
+                break;
+            case 6:
+                $request->tipoDocNom = 'Nota debito';
+                break;
+        }
+        $content = 'Nombre: '.$request->business_name."\n".
+        'Token: '.$request->token."\n".
+        'Tipo de documento: '.$request->tipoDocNom."\n".
+        'Datos de la resolución: '."\n".
+        'Tipo de documento '.$request->type_document_id."\n".
+        'Prefijo '.$request->prefix."\n".
+        'Resolución '.$request->resolution."\n".
+        'Fecha resolución '.$request->resolution_date."\n".
+        'Clave técnica '.$request->technical_key."\n".
+        'Consecutivo desde '.$request->from."\n".
+        'Consecutivo hasta '.$request->to."\n".
+        'Fecha desde '.$request->date_from."\n".
+        'Actualizado '.$request->updated_at."\n".
+        'Creado '.$request->created_at."\n".
+        'ID '.$request->id."\n".
+        'Numero '.$request->number."\n".
+        'Consecutivo siguiente '.$request->next_consecutive;
 
-        // $datos = Tools::http_post($url, $resolutionData, $authorization);
-        // $file = fopen('resolution'.intval($request->ResolutionNumber).'.txt', 'a');
-        // fwrite($file, $enterprise->business_name);
+        Storage::disk('public')->put('resolution1.txt',$content);
+        $file = 'resolution1.txt';
+        $disk = 'public';
+
+        $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($file);
+        dd($url);
+        $headers = [
+            'Content-Type: application/txt',
+        ];
+
+        return response()->download( $url, 'resolution-#'./*numero de resolución*/'.txt', $headers);
 
     }
 
@@ -153,6 +186,31 @@ class enterpriseController extends Controller
         }
     }
 
+    public function verEmpresa($id)
+    {
+        $enterprise = enterprise::find($id);
+
+        $urlGet = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $enterprise->nit;
+
+        if ($enterprise->token !== null) {
+            $authorization = "Authorization: Bearer ".$enterprise->token;
+            $response = Tools::http_get($urlGet, $authorization);
+            if (gettype($response) === "string") {
+                if ( preg_match('/{"message":"The given data was invalid.",/', $response) === 1 ) {
+                    return 0; // no se pudo crear
+                } else if (preg_match('/{"message":"The given data was invalid.",/', $response) === 0) {
+                    return 1; // el token fue creado y guardado en BD
+                }
+            } else if (gettype($response) === "array" || gettype($response) === "object") {
+                return $response;
+            }
+        } else if ($enterprise->token === null) {
+            $response = new stdClass();
+            $response->Error = 'No existe token para consultar en soenac';
+            return $response;
+        }
+    }
+
     public function softInfo($id)
     {
         $enterprise = enterprise::find($id);
@@ -179,7 +237,8 @@ class enterpriseController extends Controller
         $enterprise->save();
 
         $info = collect();
-        $info->response = $respoonse;
+        $info->response = $response;
+
         if ($datos === true) {
             $info->mensaje = 'Positivo';
         }
@@ -254,6 +313,7 @@ class enterpriseController extends Controller
     public function enterpriseUpdating($id)
     {
         $enterprise = enterprise::find($id);
+        $general = general::all()->first();
 
         $data = array();
 
@@ -295,6 +355,7 @@ class enterpriseController extends Controller
     public function certificateUp($id)
     {
         $enterprise = enterprise::find($id);
+        $general = general::all()->first();
 
         $data = array();
 

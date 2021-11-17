@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,13 +86,15 @@ Route::group(['prefix' => 'users'], function(){
 
     Route::get('enterprises', 'enterpriseController@index');
     Route::get('enterprises/{id}', 'enterpriseController@show');
-    Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
     Route::get('enterprises/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('enterprises/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
     Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
+    Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
     Route::get('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::get('enterprises/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
     Route::get('enterprises/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
+    Route::get('enterprises/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
+
     Route::post('enterprises/soenac/resolutions/{request}', 'enterpriseController@resolutions');
     Route::post('enterprises', 'enterpriseController@store');
 
