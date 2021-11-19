@@ -113,25 +113,18 @@ import { globalFunctions } from 'boot/mixins.js'
 export default {
   name: 'enterprisePage',
   created: function () {
-    this.globalGetForSelect('api/enterprises/soenac/soenacCampos', 'options')
-    this.globalGetItems()
-  },
-  beforeMount: function () {
-  },
-  mounted: function () {
-  },
-  beforeUpdate: function () {
-  },
-  updated: function () {
+    this.globalGetForSelect('api/enterprises/soenac/soenacCampos', 'options') // Request, soenac select
+    this.globalGetItems() // Mixins
   },
   data: function () {
     return {
       urlAPI: 'api/enterprises',
-      storeItems: {
+      storeItems: { // Formulario
       },
-      tableData: [],
-      options: [],
-      showForUpdate: false,
+      tableData: [], // Respuesta, tabla
+      options: [], // Respuesta, listados selct
+      showForUpdate: false, // Boton grardar--guardar edición
+      // component table
       separator: 'horizontal',
       filter: '',
       columns: [
@@ -166,6 +159,7 @@ export default {
   methods: {
     postSave () {
     },
+    // Convirtiendo data a formato permitido para evitar null
     preSave () {
       this.storeItems.last_software_response = this.storeItems.last_software_response ? this.storeItems.last_software_response : ''
       this.storeItems.last_certificate_response = this.storeItems.last_certificate_response ? this.storeItems.last_certificate_response : ''
@@ -175,7 +169,7 @@ export default {
     },
     postEdit () {
     },
-    sendToParent () {
+    sendToParent () { // mixins
     },
     eliminarEmpresa (id) {
       this.$q.dialog({

@@ -240,7 +240,7 @@ export default {
       responseEnterpriseData: { mensaje: '' },
       // -- tabs -- //
       tab: 'info',
-      // componente cuadro de información
+      // -- Componente cuadro de información --- //
       // ----- titulos y cabecera ----- //
       title: ['Datos empresa', 'Software', 'Certificado'],
       // ----- parrafo y cuerpo ----- //
@@ -264,68 +264,7 @@ export default {
     },
     postEdit () {
     },
-    checkResolution (id) {
-      this.checkedResolution = this.resolutionData[id]
-      this.oldPrefix = this.checkedResolution.Prefix
-      // console.log(this.oldPrefix)
-      this.resolutionDocOption = true
-    },
-    // boton creacion empresa
-    creacionEmpresa_dian (id) {
-      // console.log('hola create')
-      this.$q.loading.show()
-      try {
-        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
-        console.log(data.data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
-    // boton actualizar empresa
-    enterpriseUpdating (id) {
-      // console.log('hola update')
-      this.$q.loading.show()
-      try {
-        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
-    // boton soft id
-    softInfo (id) {
-      this.$q.loading.show()
-      try {
-        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
-        if (data.mensaje === 'Respuesta de software positiva') {
-          this.adminData.last_software_response = data.response
-        } else if (data.mensaje === 'Respuesta de software negativa') {
-          this.adminData.last_software_response = 'Aun sin respuesta'
-        }
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
-    // boton certificado
-    certificateUp (id) {
-      this.$q.loading.show()
-      try {
-        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
-    // select input datos de empresa
+    // Select input datos de empresa
     async selectDataEnterprise () {
       try {
         this.$q.loading.show()
@@ -336,7 +275,6 @@ export default {
         let matchInput = [] // resultados del match entre API --> BD
         let entriesBd = Object.entries(dataBd.data) // convierto objeto --> array
         let entriesSoe = Object.entries(dataSoenac.data)
-
         entriesSoe.forEach(([keySo, valueSo]) => {
           let reg = new RegExp('^' + keySo.slice(0, 10)) // expresion regular de soenac para BD
           // filtro los match
@@ -374,7 +312,109 @@ export default {
         this.$q.loading.hide()
       }
     },
-    // información resoluciones
+    // Boton creacion empresa
+    creacionEmpresa_dian (id) {
+      // console.log('hola create')
+      this.$q.loading.show()
+      try {
+        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
+        console.log(data.data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton actualizar empresa
+    enterpriseUpdating (id) {
+      // console.log('hola update')
+      this.$q.loading.show()
+      try {
+        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton soft id
+    softInfo (id) {
+      this.$q.loading.show()
+      try {
+        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
+        if (data.mensaje === 'Respuesta de software positiva') {
+          this.adminData.last_software_response = data.response
+        } else if (data.mensaje === 'Respuesta de software negativa') {
+          this.adminData.last_software_response = 'Aun sin respuesta'
+        }
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton certificado up
+    certificateUp (id) {
+      this.$q.loading.show()
+      try {
+        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton ver empresa soenac
+    async verEmpresa (id) {
+      this.$q.loading.show()
+      try {
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/verEmpresa' + '/' + id)
+        console.log(data)
+        this.responseEnterpriseData = data.data
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton numeros de producción
+    async productionNumbers (id) {
+      this.$q.loading.show()
+      try {
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/productionNumbers' + '/' + id)
+        console.log(data)
+        if (data.data.message === 'Server Error') {
+          this.$q.notify({
+            message: 'Error del servidor',
+            color: 'red'
+          })
+          this.resolutionData[0].mensaje = 'Error del servidor'
+        } else {
+          let response = data.data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
+          console.log(response)
+          if (typeof response === 'undefined') {
+            this.resolutionData[0].mensaje = 'No se han encontrado numeros de producción'
+          } else if (typeof response === 'object') {
+            this.resolutionData = response
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Escoge prefijo en resolución
+    checkResolution (id) {
+      this.checkedResolution = this.resolutionData[id]
+      this.oldPrefix = this.checkedResolution.Prefix
+      // console.log(this.oldPrefix)
+      this.resolutionDocOption = true
+    },
+    // Response (info resoluciones)
     async resolutions () {
       this.$q.loading.show()
       try {
@@ -405,51 +445,7 @@ export default {
         this.$q.loading.hide()
       }
     },
-    // boton de descarga información resoluciones
-    downloadTxt () {
-      this.$q.loading.show()
-      try {
-        let request
-        let resolution = Object.entries(this.resolutionResponse)
-        let admin = Object.entries(this.adminData)
-        let concat = resolution.concat(admin)
-        request = Object.fromEntries(concat)
-        // console.log(request)
-        let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/downloadTxt/' + request)
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
-    // boton numeros de producción
-    async productionNumbers (id) {
-      this.$q.loading.show()
-      try {
-        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/productionNumbers' + '/' + id)
-        console.log(data)
-        if (data.data.message === 'Server Error') {
-          this.$q.notify({
-            message: 'Error del servidor',
-            color: 'red'
-          })
-          this.resolutionData[0].mensaje = 'Error del servidor'
-        } else {
-          let response = data.data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
-          console.log(response)
-          if (typeof response === 'undefined') {
-            this.resolutionData[0].mensaje = 'No se han encontrado numeros de producción'
-          } else if (typeof response === 'object') {
-            this.resolutionData = response
-          }
-        }
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
-      }
-    },
+    // Tipo doc resolución
     selectDocResolution (doc) {
       // console.log(this.oldPrefix)
       switch (doc) {
@@ -479,13 +475,18 @@ export default {
           break
       }
     },
-    // boton ver empresa soenac
-    async verEmpresa (id) {
+    // Boton descarga info resoluciones
+    downloadTxt () {
       this.$q.loading.show()
       try {
-        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/verEmpresa' + '/' + id)
+        let request
+        let resolution = Object.entries(this.resolutionResponse)
+        let admin = Object.entries(this.adminData)
+        let concat = resolution.concat(admin)
+        request = Object.fromEntries(concat)
+        // console.log(request)
+        let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/downloadTxt/' + request)
         console.log(data)
-        this.responseEnterpriseData = data.data
       } catch (error) {
         console.log(error)
       } finally {
@@ -494,7 +495,6 @@ export default {
     }
   },
   computed: {
-
   },
   watcher: {
   }

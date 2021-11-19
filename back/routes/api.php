@@ -77,31 +77,26 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('permisos/permisos-agrupados-categorias', 'UserPermisosController@permisosAgrupadosCategorias');
 });
 
-// Route::group(['prefix' => 'enterprises'], function(){
-//     //Enterprises
-//     Route::apiResource('adminEnterprise/{id?}', 'enterpriseController');
+ Route::group(['prefix' => 'enterprises'], function(){
+    Route::get('', 'enterpriseController@index');
+    Route::get('/{id}', 'enterpriseController@show');
+    Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');
+    Route::get('/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
+    Route::get('/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
+    Route::get('/soenac/soenacCampos', 'enterpriseController@soenacCampos');
+    Route::get('/soenac/softInfo/{id}', 'enterpriseController@softInfo');
+    Route::get('/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
+    Route::get('/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
+    Route::get('/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
 
-//     Route::get('soenacCampos', 'enterpriseController@soenacCampos');
-// });
+    Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
+    Route::post('', 'enterpriseController@store');
 
-    Route::get('enterprises', 'enterpriseController@index');
-    Route::get('enterprises/{id}', 'enterpriseController@show');
-    Route::get('enterprises/admin/adminEnterprises', 'enterpriseController@adminIndex');
-    Route::get('enterprises/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
-    Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
-    Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
-    Route::get('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
-    Route::get('enterprises/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
-    Route::get('enterprises/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
-    Route::get('enterprises/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
-
-    Route::post('enterprises/soenac/resolutions/{request}', 'enterpriseController@resolutions');
-    Route::post('enterprises', 'enterpriseController@store');
-
-    Route::put('enterprises/{id}', 'enterpriseController@update');
-    Route::put('enterprises/certificateUp/{id}', 'enterpriseController@certificateUp');
-    Route::put('enterprises/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
-    Route::delete('enterprises/{id}', 'enterpriseController@Destroy');
+    Route::put('/{id}', 'enterpriseController@update');
+    Route::put('/certificateUp/{id}', 'enterpriseController@certificateUp');
+    Route::put('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
+    Route::delete('/{id}', 'enterpriseController@Destroy');
+});
 
     Route::get('/generals', 'generalController@index');
     Route::post('/generals', 'generalController@store');

@@ -22,10 +22,11 @@ class enterpriseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    /**  */
     public function index() {
         return $index = enterprise::all();
     }
-
+    /** Petición para select */
     public function adminIndex() {
         $arrayBuckets = array();
         $index = enterprise::all()->toArray();
@@ -239,12 +240,12 @@ class enterpriseController extends Controller
         $info = collect();
         $info->response = $response;
 
-        if ($datos === true) {
-            $info->mensaje = 'Positivo';
-        }
-        else {
-            $info->mensaje = 'Negativo';
-        }
+        // if ($datos === true) {
+        //     $info->mensaje = 'Positivo';
+        // }
+        // else {
+        //     $info->mensaje = 'Negativo';
+        // }
         return $info;
     }
 
