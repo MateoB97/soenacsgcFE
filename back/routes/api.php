@@ -76,31 +76,31 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('permisos/permisos-rol', 'UserPermisosController@permisosPorRol');
     Route::get('permisos/permisos-agrupados-categorias', 'UserPermisosController@permisosAgrupadosCategorias');
 });
-
- Route::group(['prefix' => 'enterprises'], function(){
+// rutas de gestion enterprises
+Route::group(['prefix' => 'enterprises'], function(){
     Route::get('', 'enterpriseController@index');
-    Route::get('/{id}', 'enterpriseController@show');
+    Route::get('{id}', 'enterpriseController@show');
     Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
     Route::get('/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
+    Route::post('/admin/downloadTxt/{request}', 'enterpriseController@downloadTxt');
+
+    Route::post('', 'enterpriseController@store');
+    Route::put('{id}', 'enterpriseController@update');
+    Route::delete('{id}', 'enterpriseController@Destroy');
+    // peticiones soenac
     Route::get('/soenac/soenacCampos', 'enterpriseController@soenacCampos');
     Route::get('/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::get('/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
-    Route::get('/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
     Route::get('/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
-
     Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
-    Route::post('', 'enterpriseController@store');
-
-    Route::put('/{id}', 'enterpriseController@update');
     Route::put('/certificateUp/{id}', 'enterpriseController@certificateUp');
     Route::put('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
-    Route::delete('/{id}', 'enterpriseController@Destroy');
 });
-
-    Route::get('/generals', 'generalController@index');
-    Route::post('/generals', 'generalController@store');
-
+// ruta para token maestro
+Route::group(['prefix' => 'generals'], function(){
+    Route::apiResource('', 'generalController');
+});
 
     Route::get('testing', 'enterpriseController@testing');
 

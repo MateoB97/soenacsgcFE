@@ -121,12 +121,12 @@
               </q-card-section>
               <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
                 <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length > 1 ">
+                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length > 1 ">
                     <q-item-section class="col-12" style="max-width: 650px">
                       {{item.Prefix}} : {{item.ResolutionNumber}}
                     </q-item-section>
                   </q-item>
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData[0]).length < 1">
+                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length <= 1">
                     <q-item-section class="col-12" style="max-width: 650px">
                       {{item.mensaje}}
                     </q-item-section>
@@ -231,8 +231,8 @@ export default {
       Diag2: false,
       Diag3: false,
       // datos de la resoulucion
-      resolutionData: [{ mensaje: 'No se han requerido numeros de producción' }],
-      checkedResolution: [],
+      resolutionData: { mensaje: 'No se han requerido numeros de producción' },
+      checkedResolution: {},
       resolutionDocOption: false,
       resolutionResponse: {},
       oldPrefix: '',
@@ -418,9 +418,10 @@ export default {
     async resolutions () {
       this.$q.loading.show()
       try {
+        console.log(this.checkedResolution)
         let request = this.checkedResolution
         request.id = this.adminData.id
-        let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
+        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
         console.log(data)
         // verificar el data
         // if (data) {
