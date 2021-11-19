@@ -17,7 +17,6 @@ const routes = [
     component: () => import('layouts/MyLayout.vue'),
     children: [
       { path: '', component: () => import('pages/enterprise/enterprisePage.vue') },
-      // { path: 'soenacCampos', component: () => import('pages/enterprise/enterprisePage.vue') }
       { path: 'adminEnterprise', component: () => import('pages/enterprise/enterpriseAdmin.vue') }
     ]
   },

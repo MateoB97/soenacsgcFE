@@ -76,36 +76,31 @@ Route::group(['prefix' => 'users'], function(){
     Route::get('permisos/permisos-rol', 'UserPermisosController@permisosPorRol');
     Route::get('permisos/permisos-agrupados-categorias', 'UserPermisosController@permisosAgrupadosCategorias');
 });
+// rutas de gestion enterprises
+Route::group(['prefix' => 'enterprises'], function(){
+    Route::get('', 'enterpriseController@index');
+    Route::get('{id}', 'enterpriseController@show');
+    Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');
+    Route::get('/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
+    Route::get('/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
+    Route::post('/admin/downloadTxt/{request}', 'enterpriseController@downloadTxt');
 
-// Route::group(['prefix' => 'enterprises'], function(){
-//     //Enterprises
-//     Route::apiResource('adminEnterprise/{id?}', 'enterpriseController');
-
-//     Route::get('soenacCampos', 'enterpriseController@soenacCampos');
-// });
-
-    Route::get('enterprises', 'enterpriseController@index');
-    Route::get('enterprises/{id}', 'enterpriseController@show');
-    Route::get('enterprises/admin/adminEnterprises', 'enterpriseController@adminIndex');
-    Route::get('enterprises/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
-    Route::get('enterprises/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
-    Route::get('enterprises/soenac/soenacCampos', 'enterpriseController@soenacCampos');
-    Route::get('enterprises/soenac/softInfo/{id}', 'enterpriseController@softInfo');
-    Route::get('enterprises/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
-    Route::get('enterprises/soenac/downloadTxt/{id}', 'enterpriseController@downloadTxt');
-    Route::get('enterprises/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
-
-    Route::post('enterprises/soenac/resolutions/{request}', 'enterpriseController@resolutions');
-    Route::post('enterprises', 'enterpriseController@store');
-
-    Route::put('enterprises/{id}', 'enterpriseController@update');
-    Route::put('enterprises/certificateUp/{id}', 'enterpriseController@certificateUp');
-    Route::put('enterprises/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
-    Route::delete('enterprises/{id}', 'enterpriseController@Destroy');
-
-    Route::get('/generals', 'generalController@index');
-    Route::post('/generals', 'generalController@store');
-
+    Route::post('', 'enterpriseController@store');
+    Route::put('{id}', 'enterpriseController@update');
+    Route::delete('{id}', 'enterpriseController@Destroy');
+    // peticiones soenac
+    Route::get('/soenac/soenacCampos', 'enterpriseController@soenacCampos');
+    Route::get('/soenac/softInfo/{id}', 'enterpriseController@softInfo');
+    Route::get('/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
+    Route::get('/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
+    Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
+    Route::put('/certificateUp/{id}', 'enterpriseController@certificateUp');
+    Route::put('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
+});
+// ruta para token maestro
+Route::group(['prefix' => 'generals'], function(){
+    Route::apiResource('', 'generalController');
+});
 
     Route::get('testing', 'enterpriseController@testing');
 

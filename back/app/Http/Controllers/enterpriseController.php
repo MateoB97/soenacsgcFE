@@ -42,7 +42,7 @@ class enterpriseController extends Controller
         // return $index;
         return $arrayBuckets;
     }
-
+    // Consulta api listados soenac para selects
     public function soenacCampos() {
 
         $structureToFilter = ['type_document_identifications', 'type_organizations', 'type_regimes', 'type_liabilities','municipalities', 'type_environments'];
@@ -51,25 +51,25 @@ class enterpriseController extends Controller
 
         return json_encode(Tools::filterApi($url, $fieldsToFilter , $structureToFilter));
     }
-
+    // Creación de la resolucion
     public function resolutions($request) {
 
         $enterprise = enterprise::find($request->id);
         $general = general::all()->first();
 
-        $resolutionData = array();
+        $resolutionData = new stdClass();
 
-        $resolutionData['type_document_id']  = intval($request->type_document_id);
-        $resolutionData['from']              = intval($request->FromNumber);
-        $resolutionData['to']                = intval($request->ToNumber);
-        $resolutionData['resolution']        = intval($request->ResolutionNumber);
-        $resolutionData['resolution_date']   = $request->ResolutionDate;
-        $resolutionData['technical_key']     = $request->TechnicalKey;
-        $resolutionData['date_from']         = $request->ValidDateFrom;
-        $resolutionData['date_to']           = $request->ValidDateTo;
-        $resolutionData['prefix']            = $request->Prefix;
+        $resolutionData->type_document_id  = intval($request->type_document_id);
+        $resolutionData->from              = intval($request->FromNumber);
+        $resolutionData->to                = intval($request->ToNumber);
+        $resolutionData->resolution        = intval($request->ResolutionNumber);
+        $resolutionData->resolution_date   = $request->ResolutionDate;
+        $resolutionData->technical_key     = $request->TechnicalKey;
+        $resolutionData->date_from         = $request->ValidDateFrom;
+        $resolutionData->date_to           = $request->ValidDateTo;
+        $resolutionData->prefix            = $request->Prefix;
 
-        $url = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
 
         if ($enterprise->type_environments === 1) {
             $authorization = "Authorization: Bearer ". $general->masterToken;
@@ -77,51 +77,57 @@ class enterpriseController extends Controller
             $authorization = "Authorization: Bearer ". $enterprise->token;
         }
 
-        return json_encode($datos);
+        // $response = Tools::http_post($urlPost, $resolutionData, $authorization);
+        $response = 'hello';
+        return json_encode($response);
     }
-
-    public function downloadTxt ($request) {
-
-        switch ($request->type_document_id) {
+    // Descarga documento resultados creación resolución
+    public function downloadTxt ($r) {
+        $request = json_decode($r); //por alguna razon desconocida lo convierte a array en la petición
+        // dd($request);
+        switch ($request["type_document_id"]) {
             case 1:
-                $request->tipoDocNom = 'Factura';
+                $request["tipoDocNom"] = 'Factura';
                 break;
             case 5:
-                $request->tipoDocNom = 'Nota credito';
+                $request["tipoDocNom"] = 'Nota credito';
                 break;
             case 6:
-                $request->tipoDocNom = 'Nota debito';
+                $request["tipoDocNom"] = 'Nota debito';
                 break;
         }
-        $content = 'Nombre: '.$request->business_name."\n".
-        'Token: '.$request->token."\n".
-        'Tipo de documento: '.$request->tipoDocNom."\n".
+        $content = 'Nombre: '.$request["business_name"]."\n".
+        'Token: '.$request["token"]."\n".
+        'Tipo de documento: '.$request["tipoDocNom"]."\n".
         'Datos de la resolución: '."\n".
-        'Tipo de documento '.$request->type_document_id."\n".
-        'Prefijo '.$request->prefix."\n".
-        'Resolución '.$request->resolution."\n".
-        'Fecha resolución '.$request->resolution_date."\n".
-        'Clave técnica '.$request->technical_key."\n".
-        'Consecutivo desde '.$request->from."\n".
-        'Consecutivo hasta '.$request->to."\n".
-        'Fecha desde '.$request->date_from."\n".
-        'Actualizado '.$request->updated_at."\n".
-        'Creado '.$request->created_at."\n".
-        'ID '.$request->id."\n".
-        'Numero '.$request->number."\n".
-        'Consecutivo siguiente '.$request->next_consecutive;
+        'Tipo de documento '.$request["type_document_id"]."\n".
+        'Prefijo '.$request["prefix"]."\n".
+        'Resolución '.$request["resolution"]."\n".
+        'Fecha resolución '.$request["resolution_date"]."\n".
+        'Clave técnica '.$request["technical_key"]."\n".
+        'Consecutivo desde '.$request["from"]."\n".
+        'Consecutivo hasta '.$request["to"]."\n".
+        'Fecha desde '.$request["date_from"]."\n".
+        'Actualizado '.$request["updated_at"]."\n".
+        'Creado '.$request["created_at"]."\n".
+        'ID '.$request["id"]."\n".
+        'Numero '.$request["number"]."\n".
+        'Consecutivo siguiente '.$request["next_consecutive"];
 
-        Storage::disk('public')->put('resolution1.txt',$content);
+        Storage::disk('public')->put('resolution1.txt',$content, 'public');
+        // $file = asset('storage/resolution1.txt');
         $file = 'resolution1.txt';
         $disk = 'public';
+        $name = 'resolution-#'./*numero de resolución*/'.txt';
 
-        $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($file);
-        dd($url);
+        // $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($file);
+        // $url = Storage::url('file.jpg');
+        // dd($url);
         $headers = [
             'Content-Type: application/txt',
         ];
-
-        return response()->download( $url, 'resolution-#'./*numero de resolución*/'.txt', $headers);
+        return Storage::download($url, $name, $headers);
+        // return response()->download( $url, 'resolution-#'./*numero de resolución*/'.txt', $headers);
 
     }
 
@@ -239,12 +245,12 @@ class enterpriseController extends Controller
         $info = collect();
         $info->response = $response;
 
-        if ($datos === true) {
-            $info->mensaje = 'Positivo';
-        }
-        else {
-            $info->mensaje = 'Negativo';
-        }
+        // if ($datos === true) {
+        //     $info->mensaje = 'Positivo';
+        // }
+        // else {
+        //     $info->mensaje = 'Negativo';
+        // }
         return $info;
     }
 
