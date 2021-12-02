@@ -24,6 +24,7 @@ module.exports = function (ctx) {
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
+      devtool: 'source-map',
       extendWebpack (cfg) {
         cfg.module.rules.push({
           enforce: 'pre',

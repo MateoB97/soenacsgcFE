@@ -453,7 +453,7 @@ export default {
         case 'FC':
           this.checkedResolution.type_document_id = 1
           console.log(this.checkedResolution)
-          this.checkedResolution.Prefix = this.oldPrefi
+          this.checkedResolution.Prefix = this.oldPrefix
           this.resolutions()
           break
         case 'NC':
@@ -477,7 +477,7 @@ export default {
       }
     },
     // Boton descarga info resoluciones
-    downloadTxt () {
+    async downloadTxt () {
       this.$q.loading.show()
       try {
         let request
@@ -485,8 +485,8 @@ export default {
         let admin = Object.entries(this.adminData)
         let concat = resolution.concat(admin)
         request = Object.fromEntries(concat)
-        // console.log(request)
-        let data = axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/downloadTxt/' + request)
+        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/' + request)
+        this.downloadFile(data, 'hola', 'txt')
         console.log(data)
       } catch (error) {
         console.log(error)

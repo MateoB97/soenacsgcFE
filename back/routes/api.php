@@ -78,6 +78,7 @@ Route::group(['prefix' => 'users'], function(){
 });
 // rutas de gestion enterprises
 Route::group(['prefix' => 'enterprises'], function(){
+    // peticiones admin
     Route::get('', 'enterpriseController@index');
     Route::get('{id}', 'enterpriseController@show');
     Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');

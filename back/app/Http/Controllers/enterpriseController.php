@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
-
+    /** --- CONTIENE DOS VISTAS ADMINENTERPRISE & ENTERPRISE --- */
 class enterpriseController extends Controller
 {
         /**
@@ -22,12 +22,15 @@ class enterpriseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    /**  */
-    public function index() {
+
+    /** Petición para tabla */
+    public function index()
+    {
         return $index = enterprise::all();
     }
     /** Petición para select */
-    public function adminIndex() {
+    public function adminIndex()
+    {
         $arrayBuckets = array();
         $index = enterprise::all()->toArray();
         foreach ($index as $key => $value) {
@@ -43,8 +46,9 @@ class enterpriseController extends Controller
         // return $index;
         return $arrayBuckets;
     }
-    // Consulta api listados soenac para selects
-    public function soenacCampos() {
+    /** Consulta api listados soenac para selects */
+    public function soenacCampos()
+    {
 
         $structureToFilter = ['type_document_identifications', 'type_organizations', 'type_regimes', 'type_liabilities','municipalities', 'type_environments'];
         $fieldsToFilter = ['name','id'];
@@ -52,147 +56,7 @@ class enterpriseController extends Controller
 
         return json_encode(Tools::filterApi($url, $fieldsToFilter , $structureToFilter));
     }
-    // Creación de la resolucion
-    public function resolutions($request) {
-
-        $enterprise = enterprise::find($request->id);
-        $general = general::all()->first();
-
-        $resolutionData = new stdClass();
-
-        $resolutionData->type_document_id  = intval($request->type_document_id);
-        $resolutionData->from              = intval($request->FromNumber);
-        $resolutionData->to                = intval($request->ToNumber);
-        $resolutionData->resolution        = intval($request->ResolutionNumber);
-        $resolutionData->resolution_date   = $request->ResolutionDate;
-        $resolutionData->technical_key     = $request->TechnicalKey;
-        $resolutionData->date_from         = $request->ValidDateFrom;
-        $resolutionData->date_to           = $request->ValidDateTo;
-        $resolutionData->prefix            = $request->Prefix;
-
-        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
-
-        if ($enterprise->type_environments === 1) {
-            $authorization = "Authorization: Bearer ". $general->masterToken;
-        } else if ($enterprise->type_environments === 2){
-            $authorization = "Authorization: Bearer ". $enterprise->token;
-        }
-
-        // $response = Tools::http_post($urlPost, $resolutionData, $authorization);
-        $response = 'hello';
-        return json_encode($response);
-    }
-    // Descarga documento resultados creación resolución
-    public function downloadTxt ($r) {
-        $request = json_decode($r); //por alguna razon desconocida lo convierte a array en la petición
-        // dd($request);
-        switch ($request["type_document_id"]) {
-            case 1:
-                $request["tipoDocNom"] = 'Factura';
-                break;
-            case 5:
-                $request["tipoDocNom"] = 'Nota credito';
-                break;
-            case 6:
-                $request["tipoDocNom"] = 'Nota debito';
-                break;
-        }
-        $content = 'Nombre: '.$request["business_name"]."\n".
-        'Token: '.$request["token"]."\n".
-        'Tipo de documento: '.$request["tipoDocNom"]."\n".
-        'Datos de la resolución: '."\n".
-        'Tipo de documento '.$request["type_document_id"]."\n".
-        'Prefijo '.$request["prefix"]."\n".
-        'Resolución '.$request["resolution"]."\n".
-        'Fecha resolución '.$request["resolution_date"]."\n".
-        'Clave técnica '.$request["technical_key"]."\n".
-        'Consecutivo desde '.$request["from"]."\n".
-        'Consecutivo hasta '.$request["to"]."\n".
-        'Fecha desde '.$request["date_from"]."\n".
-        'Actualizado '.$request["updated_at"]."\n".
-        'Creado '.$request["created_at"]."\n".
-        'ID '.$request["id"]."\n".
-        'Numero '.$request["number"]."\n".
-        'Consecutivo siguiente '.$request["next_consecutive"];
-
-        Storage::disk('public')->put('resolution1.txt',$content, 'public');
-        // $file = asset('storage/resolution1.txt');
-        $file = 'resolution1.txt';
-        $disk = 'public';
-        $name = 'resolution-#'./*numero de resolución*/'.txt';
-
-        // $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($file);
-        // $url = Storage::url('file.jpg');
-        // dd($url);
-        $headers = [
-            'Content-Type: application/txt',
-        ];
-        return Storage::download($url, $name, $headers);
-        // return response()->download( $url, 'resolution-#'./*numero de resolución*/'.txt', $headers);
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function create()
-    // {
-    //     //
-    //     return view('empresa.create');
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $nuevaEmpresa = new enterprise ($request->all());
-        $nuevaEmpresa->save();
-        // $tipo = enterprise::find();
-        return 'done';
-
-    }
-
-    public function confirmEnterpriseDian($id)
-    {
-
-        $enterprise = enterprise::find($id);
-
-        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $enterprise->nit;
-
-        $data = array();
-
-        $data['type_document_identification_id']   = $enterprise->type_document_identification_id;
-        $data['type_organization_id']              = $enterprise->type_organization_id;
-        $data['type_regime_id']                    = $enterprise->type_regime_id;
-        $data['type_liability_id']                 = $enterprise->type_liability_id;
-        $data['business_name']                     = $enterprise->business_name;
-        $data['merchant_registration']             = $enterprise->merchant_registration;
-        $data['municipality_id']                   = $enterprise->municipality_id;
-        $data['address']                           = $enterprise->address;
-        $data['phone']                             = $enterprise->phone;
-        $data['email']                             = $enterprise->email;
-
-        $authorization = "Authorization: Bearer DjSeSssNuNaE3ihrqcWLIMUsHk7XMwWQm5vgp7PR8JPmVcIhHbWI9zFrcMoNBVIUhg51OouaCVUZYTwO";
-
-        $response = Tools::http_post($urlPost, $data, $authorization);
-
-        if ( preg_match('/{"message":"The given data was invalid.",/', $response) === 1 ) {
-            $enterprise->token = null;
-            $enterprise->save();
-            return 0; // no se pudo crear
-        } else if (preg_match('/{"message":"The given data was invalid.",/', $response) === 0) {
-            $enterprise->token = $response;
-            $enterprise->save();
-            return 1; // el token fue creado y guardado en BD
-        }
-    }
-
+    /** Consulta BD empresas a soenac */
     public function verEmpresa($id)
     {
         $enterprise = enterprise::find($id);
@@ -217,7 +81,7 @@ class enterpriseController extends Controller
             return $response;
         }
     }
-
+    /** Consulta soft info soenac */
     public function softInfo($id)
     {
         $enterprise = enterprise::find($id);
@@ -237,8 +101,8 @@ class enterpriseController extends Controller
             $authorization = "Authorization: Bearer ". $enterprise->token;
         }
 
-        $response = Tools::http_post($urlPost, $data, $authorization);
-
+        // $response = Tools::http_post($urlPost, $data, $authorization);
+        $response = 'softInfo';
         $enterprise->last_software_response = $response;
 
         $enterprise->save();
@@ -254,7 +118,7 @@ class enterpriseController extends Controller
         // }
         return $info;
     }
-
+    /** Consulta prefijos asociados */
     public function productionNumbers($id)
     {
         $enterprise = enterprise::find($id);
@@ -274,22 +138,169 @@ class enterpriseController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    // public function create()
+    // {
+    //     //
+    //     return view('empresa.create');
+    // }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    /** Crea nueva empresa en BD */
+    public function store(Request $request)
+    {
+        $nuevaEmpresa = new enterprise ($request->all());
+        $nuevaEmpresa->save();
+        // $tipo = enterprise::find();
+        return 'done';
+
+    }
+    /** Creación empresa soenac */
+    public function confirmEnterpriseDian($id)
+    {
+
+        $enterprise = enterprise::find($id);
+
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/' . $enterprise->nit;
+
+        $data = array();
+
+        $data['type_document_identification_id']   = $enterprise->type_document_identification_id;
+        $data['type_organization_id']              = $enterprise->type_organization_id;
+        $data['type_regime_id']                    = $enterprise->type_regime_id;
+        $data['type_liability_id']                 = $enterprise->type_liability_id;
+        $data['business_name']                     = $enterprise->business_name;
+        $data['merchant_registration']             = $enterprise->merchant_registration;
+        $data['municipality_id']                   = $enterprise->municipality_id;
+        $data['address']                           = $enterprise->address;
+        $data['phone']                             = $enterprise->phone;
+        $data['email']                             = $enterprise->email;
+
+        $authorization = "Authorization: Bearer DjSeSssNuNaE3ihrqcWLIMUsHk7XMwWQm5vgp7PR8JPmVcIhHbWI9zFrcMoNBVIUhg51OouaCVUZYTwO";
+
+        // $response = Tools::http_post($urlPost, $data, $authorization);
+        $response = 'confirmEntreprise';
+        if ( preg_match('/{"message":"The given data was invalid.",/', $response) === 1 ) {
+            $enterprise->token = null;
+            $enterprise->save();
+            return 0; // no se pudo crear
+        } else if (preg_match('/{"message":"The given data was invalid.",/', $response) === 0) {
+            $enterprise->token = $response;
+            $enterprise->save();
+            return 1; // el token fue creado y guardado en BD
+        }
+    }
+    /** Creación de la resolucion */
+    public function resolutions($r)
+    {
+        $request = json_decode($r);
+
+        $enterprise = enterprise::find(intval($request['id']));
+        $general = general::all()->first();
+
+        $resolutionData = new stdClass();
+
+        $resolutionData->type_document_id  = intval($request['type_document_id']);
+        $resolutionData->from              = intval($request['FromNumber']);
+        $resolutionData->to                = intval($request['ToNumber']);
+        $resolutionData->resolution        = intval($request['ResolutionNumber']);
+        $resolutionData->resolution_date   = $request['ResolutionDate'];
+        $resolutionData->technical_key     = $request['TechnicalKey'];
+        $resolutionData->date_from         = $request['ValidDateFrom'];
+        $resolutionData->date_to           = $request['ValidDateTo'];
+        $resolutionData->prefix            = $request['Prefix'];
+
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/resolutions';
+
+        if ($enterprise['type_environments'] === 1) {
+            $authorization = "Authorization: Bearer ". $general['masterToken'];
+        } else if ($enterprise['type_environments'] === 2){
+            $authorization = "Authorization: Bearer ". $enterprise['token'];
+        }
+
+        // $response = Tools::http_post($urlPost, $resolutionData, $authorization);
+        $response = 'resolutions';
+        return json_encode($response);
+    }
+    /**
      * Display the specified resource.
      *
      * @param  \App\Models\enterprise  $enterprise
      * @return \Illuminate\Http\Response
      */
+    /** Mostrar para editar en vista principal */
     public function show(enterprise $enterprise, $id)
     {
         return $index = $enterprise->find($id);
     }
-
+    /** Data para dialogos y tabs (adminData) */
     public function showAdmin($id)
     {
         $empresa = enterprise::where('id', '=', $id)->get()->first();
         return $empresa;
     }
+    /** Descarga documento resultados creación resolución */
+    public function downloadTxt ($r)
+    {
+        $request = json_decode($r); //por alguna razon desconocida lo convierte a array en la petición
 
+        switch ($request["type_document_id"]) {
+            case 1:
+                $request["tipoDocNom"] = 'Factura';
+                break;
+            case 5:
+                $request["tipoDocNom"] = 'Nota credito';
+                break;
+            case 6:
+                $request["tipoDocNom"] = 'Nota debito';
+                break;
+        }
+
+        $name = $request["business_name"].'_'.$request["prefix"].'_'.$request["resolution"].'_'.$request["created_at"].'.txt';
+
+        // $fp = fopen($name,'w+');
+
+        $content = 'Nombre: '.$request["business_name"].PHP_EOL;
+        $content .= 'Token: '.$request["token"].PHP_EOL;
+        $content .= 'Tipo de documento: '.$request["tipoDocNom"].PHP_EOL;
+        $content .= 'Datos de la resolución: '.PHP_EOL;
+        $content .= 'Tipo de documento '.$request["type_document_id"].PHP_EOL;
+        $content .= 'Prefijo '.$request["prefix"].PHP_EOL;
+        $content .= 'Resolución '.$request["resolution"].PHP_EOL;
+        $content .= 'Fecha resolución '.$request["resolution_date"].PHP_EOL;
+        $content .= 'Clave técnica '.$request["technical_key"].PHP_EOL;
+        $content .= 'Consecutivo desde '.$request["from"].PHP_EOL;
+        $content .= 'Consecutivo hasta '.$request["to"].PHP_EOL;
+        $content .= 'Fecha desde '.$request["date_from"].PHP_EOL;
+        $content .= 'Actualizado '.$request["updated_at"].PHP_EOL;
+        $content .= 'Creado '.$request["created_at"].PHP_EOL;
+        $content .= 'ID '.$request["id"].PHP_EOL;
+        $content .= 'Numero '.$request["number"].PHP_EOL;
+        $content .= 'Consecutivo siguiente '.$request["next_consecutive"];
+
+        $disk = 'local';
+
+        $guardado = Storage::disk($disk)->put($name, $content, 'public');
+
+        // $url = asset('storage/'.$file); // ruta para disco public
+        $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($name);
+        // $url = Storage::url($file);
+
+        $headers = [
+            'Content-Type: application/txt',
+        ];
+        // $descarga = Storage::download($url, $name, $headers);
+        $descarga = response()->download( $url, $name, $headers);
+        return $descarga;
+    }
     /**
      * Show the form for editing the specified resource.
      *
@@ -308,6 +319,7 @@ class enterpriseController extends Controller
      * @param  \App\Models\enterprise  $enterprise
      * @return \Illuminate\Http\Response
      */
+    /** Actualizar en BD */
     public function update(Request $request, $id)
     {
         $editarEmpresa = enterprise::find($id);
@@ -316,7 +328,7 @@ class enterpriseController extends Controller
         $editarEmpresa->save();
         return 'done';
     }
-
+    /** Actualizar en soenac */
     public function enterpriseUpdating($id)
     {
         $enterprise = enterprise::find($id);
@@ -345,11 +357,11 @@ class enterpriseController extends Controller
             $authorization = "Authorization: Bearer ". $enterprise->token;
         }
 
-        $datos = Tools::http_put($urlPut, $data, $authorization);
-
+        // $response = Tools::http_put($urlPut, $data, $authorization);
+        $response = 'enterpriseUp';
         $info = collect();
-        if ($datos === true) {
-            $info->response = $datos;
+        if ($response === true) {
+            $info->response = $response;
             $info->mensaje = 'Actualización DIAN exitosa';
         }
         else {
@@ -358,7 +370,7 @@ class enterpriseController extends Controller
 
         return $info;
     }
-
+    /** Actualizar certificado */
     public function certificateUp($id)
     {
         $enterprise = enterprise::find($id);
@@ -377,8 +389,8 @@ class enterpriseController extends Controller
             $authorization = "Authorization: Bearer ". $enterprise->token;
         }
 
-        $response = Tools::http_put($urlPut, $data, $authorization);
-
+        // $response = Tools::http_put($urlPut, $data, $authorization);
+        $response = 'certificate';
         $enterprise->last_certificate_response = $response;
         $enterprise->save();
         return 'done';
@@ -390,14 +402,15 @@ class enterpriseController extends Controller
      * @param  \App\Models\enterprise  $enterprise
      * @return \Illuminate\Http\Response
      */
+    /** Eliminar de BD */
     public function destroy($id)
     {
         enterprise::where('id', $id)->delete();
         return 'done';
     }
-
-    public function testing() {
-       return Carbon::now();
-    }
+    /** Testing */
+    // public function testing() {
+    //    return Carbon::now();
+    // }
 
 }

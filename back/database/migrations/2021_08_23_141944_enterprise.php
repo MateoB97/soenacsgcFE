@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Enterprise extends Migration
+class Terceros extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class Enterprise extends Migration
      */
     public function up()
     {
-        Schema::create('enterprises', function (Blueprint $table) {
-            
+        Schema::create('terceros', function (Blueprint $table) {
+
             $table->bigIncrements('id');
             $table->string('business_name');
             $table->string('merchant_registration');

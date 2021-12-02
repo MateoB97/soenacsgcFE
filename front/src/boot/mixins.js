@@ -474,6 +474,21 @@ export const globalFunctions = {
       } else {
         return false
       }
+    },
+    downloadFile (data, filename, type) {
+      let newBlob = new Blob([data.data], { type: 'application/' + type }) // creación de obj blob
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) { // comprobante para IE
+        window.navigator.msSaveOrOpenBlob(newBlob)
+        return
+      }
+      const datos = window.URL.createObjectURL(newBlob) // crea url para descarga
+      let link = document.createElement('a')
+      link.href = datos
+      link.download = filename + '.' + type
+      link.click()
+      setTimeout(function () { // retardar el revoke para firefox
+        window.URL.revokeObjectURL(datos)
+      }, 100)
     }
   },
   filters: {
