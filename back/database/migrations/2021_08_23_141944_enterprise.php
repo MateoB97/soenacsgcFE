@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Terceros extends Migration
+class Enterprise extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class Terceros extends Migration
      */
     public function up()
     {
-        Schema::create('terceros', function (Blueprint $table) {
+        Schema::create('enterprises', function (Blueprint $table) {
 
             $table->bigIncrements('id');
             $table->string('business_name');
@@ -35,6 +35,8 @@ class Terceros extends Migration
             $table->text('last_software_response')->nullable();
             $table->text('last_certificate_response')->nullable();
             $table->text('last_update_enterprise_response')->nullable();
+            $table->integer('municipality_id')->nullable();
+            $table->string('token')->nullable();
             $table->integer('nit')->unique();
             $table->timestamps();
         });

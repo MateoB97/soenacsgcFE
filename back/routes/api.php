@@ -79,13 +79,13 @@ Route::group(['prefix' => 'users'], function(){
 // rutas de gestion enterprises
 Route::group(['prefix' => 'enterprises'], function(){
     // peticiones admin
-    Route::get('', 'enterpriseController@index');
-    Route::get('{id}', 'enterpriseController@show');
     Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
     Route::get('/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
     Route::post('/admin/downloadTxt/{request}', 'enterpriseController@downloadTxt');
 
+    Route::get('', 'enterpriseController@index');
+    Route::get('{id}', 'enterpriseController@show');
     Route::post('', 'enterpriseController@store');
     Route::put('{id}', 'enterpriseController@update');
     Route::delete('{id}', 'enterpriseController@Destroy');
@@ -94,9 +94,9 @@ Route::group(['prefix' => 'enterprises'], function(){
     Route::get('/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::get('/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
     Route::get('/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
+    Route::get('/certificateUp/{id}', 'enterpriseController@certificateUp');
+    Route::get('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
     Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
-    Route::put('/certificateUp/{id}', 'enterpriseController@certificateUp');
-    Route::put('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
 });
 // ruta para token maestro
 Route::group(['prefix' => 'generals'], function(){

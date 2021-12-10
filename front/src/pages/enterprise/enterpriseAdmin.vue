@@ -46,12 +46,12 @@
                   :label="label[0]"
                   >
                   </info-component>
-                  <div class="row" v-if="adminData.confirm === true">
+                  <div class="row" v-if="adminData.confirm === true || adminData.type_environments === 'Pruebas'">
                     <div class="col-5 q-ml-md q-pa-lg" >
                       <q-btn
                         class="q-ml-xs"
                         color="light-green-5"
-                        @click="creacionEmpresa_dian(this.adminData.id)"
+                        @click="creacionEmpresa_dian(adminData.id)"
                         label="Crear empresa"
                       />
                       <p>¿Crear la empresa seleccionada en el sistema DIAN?</p>
@@ -60,7 +60,7 @@
                       <q-btn
                         class="q-ml-xs"
                         color="orange-5"
-                        @click="enterpriseUpdating(this.adminData.id)"
+                        @click="enterpriseUpdating(adminData.id)"
                         label="Actualizar DIAN"
                       />
                       <p>¿Actualizar empresa en el sistema DIAN?</p>
@@ -75,12 +75,12 @@
                   :label="label[1]"
                   >
                   </info-component>
-                  <div class="row" v-if="adminData.confirm === true">
+                  <div class="row" v-if="adminData.confirm === true || adminData.type_environments === 'Pruebas'">
                     <div class="col-5 q-ml-md q-pa-lg" >
                       <q-btn
                         class="q-ml-xs"
                         color="orange-5"
-                        @click="softInfo(this.adminData.id)"
+                        @click="softInfo(adminData.id)"
                         label="Subir información"
                       />
                       <p>¿Confirmar datos del software?</p>
@@ -95,12 +95,12 @@
                   :label="label[2]"
                   >
                   </info-component>
-                  <div class="row" v-if="adminData.confirm === true">
+                  <div class="row" v-if="adminData.confirm === true || adminData.type_environments === 'Pruebas'">
                     <div class="col-5 q-ml-md q-pa-lg" >
                       <q-btn
                         class="q-ml-xs"
                         color="orange-5"
-                        @click="certificateUp(this.adminData.id)"
+                        @click="certificateUp(adminData.id)"
                         label="Subir certificado"
                       />
                       <p>¿Crear certificado?</p>
@@ -121,12 +121,12 @@
               </q-card-section>
               <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
                 <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length > 1 ">
+                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length >= 1">
                     <q-item-section class="col-12" style="max-width: 650px">
-                      {{item.Prefix}} : {{item.ResolutionNumber}}
+                      Prefijo: {{item.Prefix}} || Resolución: {{item.ResolutionNumber}} || Rango: {{item.FromNumber}} - {{item.ToNumber}}
                     </q-item-section>
                   </q-item>
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length <= 1">
+                  <q-item tag="label" v-ripple v-if="item.mensaje">
                     <q-item-section class="col-12" style="max-width: 650px">
                       {{item.mensaje}}
                     </q-item-section>
@@ -231,7 +231,7 @@ export default {
       Diag2: false,
       Diag3: false,
       // datos de la resoulucion
-      resolutionData: { mensaje: 'No se han requerido numeros de producción' },
+      resolutionData: [],
       checkedResolution: {},
       resolutionDocOption: false,
       resolutionResponse: {},
@@ -330,7 +330,7 @@ export default {
       // console.log('hola update')
       this.$q.loading.show()
       try {
-        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
+        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
         console.log(data)
       } catch (error) {
         console.log(error)
@@ -343,11 +343,11 @@ export default {
       this.$q.loading.show()
       try {
         let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
-        if (data.mensaje === 'Respuesta de software positiva') {
-          this.adminData.last_software_response = data.response
-        } else if (data.mensaje === 'Respuesta de software negativa') {
-          this.adminData.last_software_response = 'Aun sin respuesta'
-        }
+        // if (data.mensaje === 'Respuesta de software positiva') {
+        //   this.adminData.last_software_response = data.response
+        // } else if (data.mensaje === 'Respuesta de software negativa') {
+        //   this.adminData.last_software_response = 'Aun sin respuesta'
+        // }
         console.log(data)
       } catch (error) {
         console.log(error)
@@ -385,20 +385,26 @@ export default {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/productionNumbers' + '/' + id)
+        data = JSON.parse(data.data)
         console.log(data)
-        if (data.data.message === 'Server Error') {
+        if (data.message === 'Server Error') {
           this.$q.notify({
             message: 'Error del servidor',
             color: 'red'
           })
           this.resolutionData[0].mensaje = 'Error del servidor'
-        } else {
-          let response = data.data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
+        } else if (data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.OperationCode === '100') {
+          let response = data.responseDian.Envelope.Body.GetNumberingRangeResponse.GetNumberingRangeResult.ResponseList.NumberRangeResponse
           console.log(response)
           if (typeof response === 'undefined') {
             this.resolutionData[0].mensaje = 'No se han encontrado numeros de producción'
           } else if (typeof response === 'object') {
-            this.resolutionData = response
+            if (this.isArray(response)) {
+              this.resolutionData = response
+            } else if (this.isObject(response)) {
+              this.resolutionData = [response]
+            }
+            console.log(this.resolutionData)
           }
         }
       } catch (error) {
@@ -411,18 +417,18 @@ export default {
     checkResolution (id) {
       this.checkedResolution = this.resolutionData[id]
       this.oldPrefix = this.checkedResolution.Prefix
-      // console.log(this.oldPrefix)
       this.resolutionDocOption = true
+      console.log(this.checkedResolution)
     },
     // Response (info resoluciones)
     async resolutions () {
       this.$q.loading.show()
       try {
-        console.log(this.checkedResolution)
-        let request = this.checkedResolution
-        request.id = this.adminData.id
+        let request = {}
+        this.checkedResolution.id = this.adminData.id
+        request = JSON.stringify(this.checkedResolution)
+        console.log(request)
         let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
-        console.log(data)
         // verificar el data
         // if (data) {
         //   this.$q.notify({
@@ -435,7 +441,7 @@ export default {
         //     color: 'green'
         //   })
         // }
-        this.resolutionResponse = data
+        this.resolutionResponse = JSON.parse(data.data)
         // if (data) { // falta saber como se recibe la data
         //   this.Diag2 = true
         // }
@@ -481,18 +487,25 @@ export default {
       this.$q.loading.show()
       try {
         let request
-        let resolution = Object.entries(this.resolutionResponse)
+        let resolution = Object.entries(this.resolutionResponse.resolution)
+        this.adminData.certificate = atob(this.adminData.certificate)
         let admin = Object.entries(this.adminData)
         let concat = resolution.concat(admin)
-        request = Object.fromEntries(concat)
+        request = JSON.stringify(Object.fromEntries(concat))
         let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/' + request)
-        this.downloadFile(data, 'hola', 'txt')
+        this.downloadFile(data, this.adminData.business_name + this.resolutionResponse.resolution.prefix + this.resolutionResponse.resolution.to + '-' + this.resolutionResponse.resolution.from, 'txt')
         console.log(data)
       } catch (error) {
         console.log(error)
       } finally {
         this.$q.loading.hide()
       }
+    },
+    isArray (myArray) {
+      return myArray.constructor === Array
+    },
+    isObject (myObject) {
+      return myObject.constructor === Object
     }
   },
   computed: {

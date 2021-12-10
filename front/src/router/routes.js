@@ -42,7 +42,7 @@ const routes = [
     name: 'login',
     component: () => import('pages/Login.vue'),
     meta: {
-      auth: true
+      auth: false
     }
   }
 ]
