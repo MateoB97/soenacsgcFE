@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class enterprise extends Model
 {
+    protected $dates = ['created_at', 'updated_at'];
+
     protected $table = 'enterprises';
 
     protected $fillable = [
@@ -33,6 +35,7 @@ class enterprise extends Model
         'last_certificate_response',
         'last_update_enterprise_response',
         'nit',
+        'token',
         'municipality_id'
     ];
 
@@ -57,6 +60,7 @@ class enterprise extends Model
         'last_certificate_response',
         'last_update_enterprise_response',
         'nit',
+        'token',
         'municipality_id'
     );
 

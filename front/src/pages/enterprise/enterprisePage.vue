@@ -58,6 +58,9 @@
             <div class="col-3">
               <q-input type="number" v-model="storeItems.ceo_document" label="Documento_Rep/legal"/>
             </div>
+            <div class="col-3">
+              <q-input type="text" v-model="storeItems.token" label="Token"/>
+            </div>
         </div>
         <div class="row q-mt-md">
             <div class="col-2">
@@ -142,7 +145,7 @@ export default {
         { name: 'software_id', required: true, label: 'Id software', align: 'left', field: 'software_id', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'software_pin', required: true, label: 'Pin software', align: 'left', field: 'software_pin', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'software_url', required: true, label: 'Url software', align: 'left', field: 'software_url', sortable: true, classes: 'my-class', style: 'width: 200px' },
-        { name: 'certificate', required: true, label: 'Certificado', align: 'left', field: 'certificate', sortable: true, classes: 'my-class', style: 'width: 200px' },
+        { name: 'token', required: true, label: 'Token', align: 'left', field: 'token', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'certificate_password', required: true, label: 'Pass Certificado', align: 'left', field: 'certificate_password', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'type_environments', required: true, label: 'ambiente', align: 'left', field: 'type_environments', sortable: true, classes: 'my-class', style: 'width: 200px' },
         { name: 'last_software_response', required: true, label: 'respuesta de software', align: 'left', field: 'last_software_response', sortable: true, classes: 'my-class', style: 'width: 200px' },

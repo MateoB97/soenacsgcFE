@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Tools extends Model
 {
     public static function dateTimeSql(){
-		// return 'Y-m-d H:i:s';
-		return 'Y-d-m H:i:s.v';
+		return 'Y-m-d H:i:s.v';
+		// return 'Y-d-m H:i:s.v';
 	}
 
     public static function  http_get($url, $authorization = false){
@@ -52,8 +52,8 @@ class Tools extends Model
 	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
 	        CURLOPT_POSTFIELDS => json_encode($body)
 	    ];
-
 	    curl_setopt_array($ch, $curlConfig);
+        // dd($curlConfig);
 
 	    $response = curl_exec($ch);
 

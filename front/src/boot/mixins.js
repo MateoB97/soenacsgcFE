@@ -13,12 +13,12 @@ export const globalFunctions = {
         }
       )
     },
-    globalCapitalize: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      value = value.toLowerCase()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    },
+    // globalCapitalize: function (value) {
+    //   if (!value) return ''
+    //   value = value.toString()
+    //   value = value.toLowerCase()
+    //   return value.charAt(0).toUpperCase() + value.slice(1)
+    // },
     globalValidate (text, id = null, noValidate = 0) {
       this.$q.dialog({
         message: '¿ Quieres ' + text + ' este item ?',
@@ -109,9 +109,9 @@ export const globalFunctions = {
       var app = this
       var callback = 0
       for (const prop in this.storeItems) {
-        if (typeof this.storeItems[prop] === 'string') {
-          this.storeItems[prop] = this.globalCapitalize(this.storeItems[prop])
-        }
+        // if (typeof this.storeItems[prop] === 'string') {
+        //   this.storeItems[prop] = this.globalCapitalize(this.storeItems[prop])
+        // }
         if ((this.storeItems[prop] == null) && (noValidate !== 1)) {
           this.$q.notify({ color: 'negative', message: 'El campo ' + prop + ' debe tener algun valor.' })
           itemNull = 1

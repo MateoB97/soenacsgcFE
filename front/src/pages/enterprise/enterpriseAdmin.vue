@@ -114,6 +114,7 @@
         <div class="col-shrink no-wrap q-mx-md q-my-md q-col-gutter-md items-center justify-center content-center">
           <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="productionNumbers(adminData.id), Diag1 = true">Ver numeros de produccion</q-btn></div>
           <div class="col-12" style="max-width: 800px" v-if="adminData.token !== null"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="verEmpresa(adminData.id), Diag3 = true">Ver empresa soenac</q-btn></div>
+          <div class="col-12" style="max-width: 800px" v-if="adminData.type_environments === 'Pruebas'"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="resolucionHab(adminData.id), Diag4 = true">Resolución facturas de prueba</q-btn></div>
           <q-dialog v-model="Diag1">
             <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
               <q-card-section class="justify-center q-pa-md">
@@ -184,6 +185,20 @@
               </q-card-section>
             </q-card>
           </q-dialog>
+          <q-dialog v-model="Diag4">
+            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
+              <q-card-section class="row items-center q-pb-none">
+                <q-space />
+                <q-btn icon="close" flat round dense v-close-popup />
+              </q-card-section>
+              <q-card-section class="q-ma-md q-pa-md" style="width: 600px">
+                <div>{{resolucionPrueba}}</div>
+              </q-card-section>
+              <q-card-actions class="relative-position justify-center q-pa-md">
+                <q-btn @click="facPruebas(adminData.id)" class="q-mx-xl absolute-center btn-limon">Facturación de prueba</q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
         </div>
       </div>
     </q-page>
@@ -209,7 +224,7 @@ export default {
   mounted: function () {
   },
   beforeUpdate: function () {
-    // console.log(this.adminData)
+    console.log(this.adminData)
   },
   updated: function () {
   },
@@ -230,12 +245,17 @@ export default {
       Diag1: false,
       Diag2: false,
       Diag3: false,
+      Diag4: false,
       // datos de la resoulucion
       resolutionData: [],
       checkedResolution: {},
       resolutionDocOption: false,
       resolutionResponse: {},
       oldPrefix: '',
+      // respuesta doc resolución prueba
+      resolucionPrueba: '',
+      // facturas de prueba
+      facturasPruebas: '',
       // respuesta datos soenac-empresa
       responseEnterpriseData: { mensaje: '' },
       // -- tabs -- //
@@ -247,12 +267,12 @@ export default {
       label: [
         ['Nombre de la empresa', 'Tipo de documento', 'NIT', 'Dirección', 'Municipalidad', 'Telefono', 'Correo electronico', 'Documento del representante', 'Tipo de ambiente'],
         ['Software ID', 'Software PIN', 'Software URL', 'Respuesta del software'],
-        ['Certificado', 'Contraseña del certificado', 'Respuesta del certificado']
+        ['Contraseña del certificado', 'Respuesta del certificado']
       ],
       field: [
         ['business_name', 'type_document_identification_id', 'nit', 'address', 'municipality_id', 'phone', 'email', 'ceo_document', 'type_environments'],
         ['software_id', 'software_pin', 'software_url', 'last_software_response'],
-        ['certificate', 'certificate_password', 'last_certificate_response']
+        ['certificate_password', 'last_certificate_response']
       ]
     }
   },
@@ -313,11 +333,11 @@ export default {
       }
     },
     // Boton creacion empresa
-    creacionEmpresa_dian (id) {
+    async creacionEmpresa_dian (id) {
       // console.log('hola create')
       this.$q.loading.show()
       try {
-        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
         console.log(data.data)
       } catch (error) {
         console.log(error)
@@ -326,11 +346,11 @@ export default {
       }
     },
     // Boton actualizar empresa
-    enterpriseUpdating (id) {
+    async enterpriseUpdating (id) {
       // console.log('hola update')
       this.$q.loading.show()
       try {
-        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
         console.log(data)
       } catch (error) {
         console.log(error)
@@ -339,10 +359,10 @@ export default {
       }
     },
     // Boton soft id
-    softInfo (id) {
+    async softInfo (id) {
       this.$q.loading.show()
       try {
-        let data = axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/softInfo' + '/' + id)
         // if (data.mensaje === 'Respuesta de software positiva') {
         //   this.adminData.last_software_response = data.response
         // } else if (data.mensaje === 'Respuesta de software negativa') {
@@ -356,10 +376,10 @@ export default {
       }
     },
     // Boton certificado up
-    certificateUp (id) {
+    async certificateUp (id) {
       this.$q.loading.show()
       try {
-        let data = axios.put(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
         console.log(data)
       } catch (error) {
         console.log(error)
@@ -427,7 +447,9 @@ export default {
         let request = {}
         this.checkedResolution.id = this.adminData.id
         request = JSON.stringify(this.checkedResolution)
+        // request = this.checkedResolution
         console.log(request)
+        // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions', request)
         let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
         // verificar el data
         // if (data) {
@@ -446,6 +468,34 @@ export default {
         //   this.Diag2 = true
         // }
         this.Diag2 = true
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // resolucion hab
+    async resolucionHab () {
+      this.$q.loading.show()
+      try {
+        let id = this.adminData.id
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolucionPrueba/' + id)
+        console.log(data)
+        this.resolucionPrueba = data.data
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // fac pruebas
+    async facPruebas (id) {
+      this.$q.loading.show()
+      try {
+        let id = this.adminData.id
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/facPruebas/' + id)
+        console.log(data)
+        data.data = this.facPruebas
       } catch (error) {
         console.log(error)
       } finally {
@@ -491,8 +541,8 @@ export default {
         this.adminData.certificate = atob(this.adminData.certificate)
         let admin = Object.entries(this.adminData)
         let concat = resolution.concat(admin)
-        request = JSON.stringify(Object.fromEntries(concat))
-        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/' + request)
+        request = Object.fromEntries(concat)
+        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/', request)
         this.downloadFile(data, this.adminData.business_name + this.resolutionResponse.resolution.prefix + this.resolutionResponse.resolution.to + '-' + this.resolutionResponse.resolution.from, 'txt')
         console.log(data)
       } catch (error) {

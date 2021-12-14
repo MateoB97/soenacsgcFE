@@ -3,7 +3,7 @@
     <div class="q-gutter-y-md" style="max-width: 600px">
       <div class="q-mx-md col-12"><h5>{{title}}</h5></div>
       <div class="row">
-        <div class="col-4" v-for="(itemText, key) in outputText" :key="key + 'text'">
+        <div class="col-6" v-for="(itemText, key) in outputText" :key="key + 'text'">
           <p class="parrafoLabel">{{itemText.label}}</p>
           <p>{{ itemText.parrafo }}</p>
         </div>

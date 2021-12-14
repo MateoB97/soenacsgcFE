@@ -94,8 +94,11 @@ Route::group(['prefix' => 'enterprises'], function(){
     Route::get('/soenac/softInfo/{id}', 'enterpriseController@softInfo');
     Route::get('/soenac/productionNumbers/{id}', 'enterpriseController@productionNumbers');
     Route::get('/soenac/verEmpresa/{id}', 'enterpriseController@verEmpresa');
+    Route::get('soenac/resolucionPrueba/{id}', 'enterpriseController@resolucionPrueba');
+    Route::get('soenac/facPruebas/{id}', 'enterpriseController@facPruebas');
     Route::get('/certificateUp/{id}', 'enterpriseController@certificateUp');
-    Route::get('/enterpriseUpdating/{id}', 'enterpriseController@enterpriseUpdating');
+    Route::get('/enterpriseUpdate/{id}', 'enterpriseController@enterpriseUpdating');
+    // Route::post('/soenac/resolutions', 'enterpriseController@resolutions');
     Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
 });
 // ruta para token maestro
