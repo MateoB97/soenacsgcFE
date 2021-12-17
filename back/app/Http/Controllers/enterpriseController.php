@@ -190,7 +190,7 @@ class enterpriseController extends Controller
         }
     }
     /** Creación facturas de prueba---revisar */
-    public function facPruebas($id, $dataNumber = 0)
+    public function facPruebas($id, $dataNumber = 0, $contents = '')
     {
         $enterprise = enterprise::find(intval($id));
 
@@ -203,7 +203,7 @@ class enterpriseController extends Controller
         if ($dataNumber != 0) {
             $data["number"] = $dataNumber;
         } else {
-            $data["number"]    = 990000000;
+            $data["number"] = 990000000;
         }
         $data["type_document_id"] = 1;
         $data["customer"] = (object) [
@@ -220,7 +220,7 @@ class enterpriseController extends Controller
             "charge_total_amount"  => "0.00",
             "payable_amount"  => "357000.00"
         ];
-        $data["invoice_lines"]  = [(object)[
+        $data["invoice_lines"] = [(object)[
             "unit_measure_id" => 642,
             "invoiced_quantity" => "1.000000",
             "line_extension_amount" => "300000.00",
@@ -242,18 +242,30 @@ class enterpriseController extends Controller
 
         $factura = Tools::http_post($urlPost, $data, $authorization);
 
-        $disk = 'local';
-        $name = 'codigoZipConfirm.txt';
+        $suma = $data["number"];
 
-        // if (Storage::disk($disk)->exists($name)) {
+        // $disk = 'local';
+
+        // $name = 'facPruebaConfirm.txt';
+
+        // if (Storage::disk($disk)->exists($name) && $data["number"] === 990000000) {
         //     $eliminar = Storage::delete($name);
+        //     $crear = Storage::disk($disk)->put($name, $factura, 'public');
+        //     $escribir = Storage::append($name, $factura);
+        //     // dd('eliminar');
+        // } else if (!Storage::disk($disk)->exists($name) && $data["number"] === 990000000) {
+        //     $crear = Storage::disk($disk)->put($name, $factura, 'public');
+        //     // dd('crear');
+        // } else if (Storage::disk($disk)->exists($name) && $data["number"] > 990000000) {
+        //     $escribir = Storage::append($name, $factura);
+        //     // dd('escribir');
         // }
-
-        $crear = Storage::disk($disk)->put($name, $factura, 'public');
+        $contents .= $factura;
 
         $factura = json_decode($factura);
 
-        if ($factura->zip_key) {
+        // if ($factura->zip_key && Storage::disk($disk)->exists($name)) {
+        if ($factura->zip_key && $contents) {
             $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/status/zip/'.$factura->zip_key;
             $dataZip = array();
             $codigoZip = json_decode(Tools::http_post($urlPost, $dataZip, $authorization));
@@ -261,31 +273,43 @@ class enterpriseController extends Controller
 
             if ($codigoZip->is_valid === true) {
                 $mensaje = new stdClass();
-                $suma = $data["number"];
-                $suma++;
                 $mensaje->status_description = $codigoZip->status_description;
                 $mensaje->status_message = $codigoZip->status_message;
                 $mensaje->zip_key = $codigoZip->zip_key;
                 $mensaje->uuid = $codigoZip->uuid;
                 $mensaje->number = $codigoZip->number;
-                $escribir = Storage::append($name, json_encode($mensaje));
-                if ($suma === 990000010) {
-                    $contents = Storage::get($name);
+
+                // $escribir = Storage::append($name, json_encode($mensaje));
+                $contents .= json_encode($mensaje);
+
+                if ($suma === 990000010 ) {
+                    // $contents = Storage::get($name);
+                    // dd(Storage::get($name));
                     return $contents;
-                } else {
-                    $this->facPruebas($id, $suma);
+                } else if ( $contents && $suma < 990000010){
+                    $suma++;
+                    $this->facPruebas($id, $suma, $contents);
                 }
-            } else if ($codigoZip->is_valid === false) {
+            } else if ($codigoZip->is_valid === false || $codigoZip->is_valid === null) {
                 $mensaje = new stdClass();
                 $mensaje->status_description = $codigoZip->status_description;
                 $mensaje->status_message = $codigoZip->status_message;
                 $mensaje->zip_key = $codigoZip->zip_key;
                 $mensaje->uuid = $codigoZip->uuid;
                 $mensaje->number = $codigoZip->number;
-                $escribir = Storage::append($name, json_encode($mensaje));
-                $contents = Storage::get($name);
 
-                return $contents;
+                // $escribir = Storage::append($name, json_encode($mensaje));
+                $contents .= json_encode($mensaje);
+
+                if ($suma === 990000010) {
+                    // $contents = Storage::get($name);
+                    // dd('hola1');
+                    return $contents;
+                } else if($contents && $suma < 990000010) {
+                    $suma++;
+                    // dd('hola2');
+                    $this->facPruebas($id, $suma, $contents);
+                }
             }
         }
 
@@ -312,6 +336,7 @@ class enterpriseController extends Controller
     public function store(Request $request)
     {
         $nuevaEmpresa = new enterprise ($request->all());
+
         $nuevaEmpresa->save();
         // $tipo = enterprise::find();
         return 'done';
@@ -339,25 +364,27 @@ class enterpriseController extends Controller
         $data->phone                             = $enterprise->phone;
         $data->email                             = $enterprise->email;
 
-        $authorization = "Authorization: Bearer DjSeSssNuNaE3ihrqcWLIMUsHk7XMwWQm5vgp7PR8JPmVcIhHbWI9zFrcMoNBVIUhg51OouaCVUZYTwO";
+        // $authorization = "Authorization: Bearer DjSeSssNuNaE3ihrqcWLIMUsHk7XMwWQm5vgp7PR8JPmVcIhHbWI9zFrcMoNBVIUhg51OouaCVUZYTwO";
         $authorization = "Authorization: Bearer ".$general->masterToken;
 
         $response = Tools::http_post($urlPost, $data, $authorization);
         // $response = 'confirmEntreprise';
         if ( preg_match('/{"message":"The given data was invalid.",/', $response) === 1 ) {
-            $enterprise->token = null;
+            $enterprise->token = null; // al crear empresa 2 veces se borra token
             $enterprise->save();
             return $response; // no se pudo crear
         } else if (preg_match('/{"message":"The given data was invalid.",/', $response) === 0) {
-            $response = json_decode($response);
-            $enterprise->token = $response->token;
-            $enterprise->save();
+            // $response = json_decode($response);
+            // $enterprise->token = $response->token;
+            // $enterprise->save();
             $response = json_encode($response); // revisar si esto si llega bien
             return $response; // el token fue creado y guardado en BD
+        } else if (preg_match('/{"message":"Unauthenticated."}/', $response) === 1) {
+            return $response;
         }
     }
     /** Creación de la resolucion */
-    public function resolutions($r)
+    public function resolutions(Request $r)
     {
         // dd($r);
         $request = json_decode($r,false);
@@ -407,54 +434,55 @@ class enterpriseController extends Controller
         return $empresa;
     }
     /** Descarga documento resultados creación resolución */
-    public function downloadTxt ($r)
-    {
-        $request = json_decode($r,false);
+    // public function downloadTxt (Request $r)
+    // {
+    //     $request = json_decode($r,false);
 
-        // return $request;
-        switch ($request->type_document_id) {
-            case 1:
-                $request->tipoDocNom = 'Factura';
-                break;
-            case 5:
-                $request->tipoDocNom = 'Nota credito';
-                break;
-            case 6:
-                $request->tipoDocNom = 'Nota debito';
-                break;
-        }
+    //     switch ($request->type_document_id) {
+    //         case 1:
+    //             $request->tipoDocNom = 'Factura';
+    //             break;
+    //         case 5:
+    //             $request->tipoDocNom = 'Nota credito';
+    //             break;
+    //         case 6:
+    //             $request->tipoDocNom = 'Nota debito';
+    //             break;
+    //     }
 
-        $name = $request->business_name.'_'.$request->prefix.'_'.$request->to.'_'.$request->from.'_'.$request->created_at.'.txt';
-        $disk = 'local';
+    //     // $name = $request->business_name.'_'.$request->prefix.'_'.$request->to.'_'.$request->from.'_'.$request->created_at.'.txt';
+    //     // $disk = 'local';
 
-        $content = 'Nombre: '.$request->business_name.PHP_EOL;
-        $content .= 'Token: '.$request->token.PHP_EOL;
-        $content .= 'Tipo de documento: '.$request->tipoDocNom.PHP_EOL;
-        $content .= 'Datos de la resolución: '.PHP_EOL;
-        $content .= 'Tipo de documento '.$request->type_document_id.PHP_EOL;
-        $content .= 'Prefijo '.$request->prefix.PHP_EOL;
-        $content .= 'Resolución '.$request->resolution.PHP_EOL;
-        $content .= 'Fecha resolución '.$request->resolution_date.PHP_EOL;
-        $content .= 'Clave técnica '.$request->technical_key.PHP_EOL;
-        $content .= 'Consecutivo desde '.$request->from.PHP_EOL;
-        $content .= 'Consecutivo hasta '.$request->to.PHP_EOL;
-        $content .= 'Fecha desde '.$request->date_from.PHP_EOL;
-        $content .= 'Actualizado '.$request->updated_at.PHP_EOL;
-        $content .= 'Creado '.$request->created_at.PHP_EOL;
-        $content .= 'ID '.$request->id.PHP_EOL;
-        $content .= 'Numero '.$request->number.PHP_EOL;
-        $content .= 'Consecutivo siguiente '.$request->next_consecutive;
+    //     if ($content === '') {
+    //         $content = 'Nombre: '.$request->business_name.PHP_EOL;
+    //         $content .= 'Token: '.$request->token.PHP_EOL;
+    //         $content .= 'Tipo de documento: '.$request->tipoDocNom.PHP_EOL;
+    //         $content .= 'Datos de la resolución: '.PHP_EOL;
+    //         $content .= 'Tipo de documento '.$request->type_document_id.PHP_EOL;
+    //         $content .= 'Prefijo '.$request->prefix.PHP_EOL;
+    //         $content .= 'Resolución '.$request->resolution.PHP_EOL;
+    //         $content .= 'Fecha resolución '.$request->resolution_date.PHP_EOL;
+    //         $content .= 'Clave técnica '.$request->technical_key.PHP_EOL;
+    //         $content .= 'Consecutivo desde '.$request->from.PHP_EOL;
+    //         $content .= 'Consecutivo hasta '.$request->to.PHP_EOL;
+    //         $content .= 'Fecha desde '.$request->date_from.PHP_EOL;
+    //         $content .= 'Actualizado '.$request->updated_at.PHP_EOL;
+    //         $content .= 'Creado '.$request->created_at.PHP_EOL;
+    //         $content .= 'ID '.$request->id.PHP_EOL;
+    //         $content .= 'Numero '.$request->number.PHP_EOL;
+    //         $content .= 'Consecutivo siguiente '.$request->next_consecutive;
+    //     }
 
-        $guardado = Storage::disk($disk)->put($name, $content, 'public');
+    //     // $guardado = Storage::disk($disk)->put($name, $content, 'public');
 
-        $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($name);
+    //     // $url = Storage::disk($disk)->getDriver()->getAdapter()->applyPathPrefix($name);
 
-        $headers = [
-            'Content-Type: application/txt',
-        ];
-        $descarga = response()->download( $url, $name, $headers);
-        return $descarga;
-    }
+    //     // $headers = [
+    //     //     'Content-Type: application/txt',
+    //     // ];
+    //     // $descarga = response()->download( $url, $name, $headers);
+    //     return $descarga;
+    // }
     /**
      * Show the form for editing the specified resource.
      *

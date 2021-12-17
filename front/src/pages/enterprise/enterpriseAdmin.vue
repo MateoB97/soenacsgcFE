@@ -154,7 +154,7 @@
                 {{resolutionResponse}}
               </q-card-section>
               <q-card-actions class="relative-position justify-center q-pa-md">
-                <q-btn @click="downloadTxt()" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
+                <q-btn @click="this.downloadFile(sessionStorage.getItem('resolutionFile'), this.adminData.business_name + this.resolutionResponse.resolution.prefix + this.resolutionResponse.resolution.to + '-' + this.resolutionResponse.resolution.from, 'txt')" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -224,7 +224,7 @@ export default {
   mounted: function () {
   },
   beforeUpdate: function () {
-    console.log(this.adminData)
+    // console.log(this.adminData)
   },
   updated: function () {
   },
@@ -256,7 +256,7 @@ export default {
       resolucionPrueba: '',
       // facturas de prueba
       facturasPruebas: '',
-      // respuesta datos soenac-empresa
+      // respuesta verdatos soenac-empresa
       responseEnterpriseData: { mensaje: '' },
       // -- tabs -- //
       tab: 'info',
@@ -338,6 +338,11 @@ export default {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
+        this.$q.notify({
+          message: data.dada,
+          color: 'primary',
+          multiLine: true
+        })
         console.log(data.data)
       } catch (error) {
         console.log(error)
@@ -446,11 +451,11 @@ export default {
       try {
         let request = {}
         this.checkedResolution.id = this.adminData.id
-        request = JSON.stringify(this.checkedResolution)
-        // request = this.checkedResolution
+        // request = JSON.stringify(this.checkedResolution)
+        request = this.checkedResolution
         console.log(request)
-        // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions', request)
-        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
+        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions', request)
+        // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
         // verificar el data
         // if (data) {
         //   this.$q.notify({
@@ -463,11 +468,73 @@ export default {
         //     color: 'green'
         //   })
         // }
-        this.resolutionResponse = JSON.parse(data.data)
+        this.rellenadoTxt(data.data)
         // if (data) { // falta saber como se recibe la data
         //   this.Diag2 = true
         // }
         this.Diag2 = true
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$q.loading.hide()
+      }
+    },
+    // Boton rellenado info resoluciones
+    async rellenadoTxt (data) {
+      this.$q.loading.show()
+      try {
+        let request
+        data = JSON.parse(data) // *************
+        let resolution = Object.entries(data.resolution)
+        // this.resolutionResponse = JSON.parse(data.data) // ******************
+        // this.adminData.certificate = this.adminData.certificate
+        let admin = Object.entries(this.adminData)
+        let concat = resolution.concat(admin)
+        request = Object.fromEntries(concat)
+        // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/', request)
+        switch (request.type_document_id) {
+          case 1:
+            request.tipoDocNom = 'Factura'
+            break
+          case 5:
+            request.tipoDocNom = 'Nota credito'
+            break
+          case 6:
+            request.tipoDocNom = 'Nota debito'
+            break
+        }
+        let content
+
+        content = 'Nombre: '.request.business_name + '<br />'
+        content += 'Token: '.request.token + '<br />'
+        content += 'Tipo de documento: '.request.tipoDocNom + '<br />'
+        content += 'Datos de la resolución: ' + '<br />'
+        content += 'Tipo de documento '.request.type_document_id + '<br />'
+        content += 'Prefijo '.request.prefix + '<br />'
+        content += 'Resolución '.request.resolution + '<br />'
+        content += 'Fecha resolución '.request.resolution_date + '<br />'
+        content += 'Clave técnica '.request.technical_key + '<br />'
+        content += 'Consecutivo desde '.request.from + '<br />'
+        content += 'Consecutivo hasta '.request.to + '<br />'
+        content += 'Fecha desde '.request.date_from + '<br />'
+        content += 'Actualizado '.request.updated_at + '<br />'
+        content += 'Creado '.request.created_at + '<br />'
+        content += 'ID '.request.id + '<br />'
+        content += 'Numero '.request.number + '<br />'
+        content += 'Consecutivo siguiente '.request.next_con + '<br />'
+
+        let nameFile = 'resolutionFile'
+        let sessionFile = sessionStorage.getItem(nameFile)
+        if (sessionFile === null) {
+          this.resolutionResponse.content = content
+          sessionStorage.setItem(nameFile, content)
+        } else {
+          let sessionContent = sessionStorage.getItem(nameFile)
+          sessionContent += content
+          sessionStorage.setItem(nameFile, sessionContent)
+          this.resolutionResponse.content = sessionContent
+        }
+        console.log(data)
       } catch (error) {
         console.log(error)
       } finally {
@@ -495,7 +562,7 @@ export default {
         let id = this.adminData.id
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/facPruebas/' + id)
         console.log(data)
-        data.data = this.facPruebas
+        data.data = this.facturasPruebas
       } catch (error) {
         console.log(error)
       } finally {
@@ -530,25 +597,6 @@ export default {
           this.checkedResolution.Prefix = newPrefix3
           this.resolutions()
           break
-      }
-    },
-    // Boton descarga info resoluciones
-    async downloadTxt () {
-      this.$q.loading.show()
-      try {
-        let request
-        let resolution = Object.entries(this.resolutionResponse.resolution)
-        this.adminData.certificate = atob(this.adminData.certificate)
-        let admin = Object.entries(this.adminData)
-        let concat = resolution.concat(admin)
-        request = Object.fromEntries(concat)
-        let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/', request)
-        this.downloadFile(data, this.adminData.business_name + this.resolutionResponse.resolution.prefix + this.resolutionResponse.resolution.to + '-' + this.resolutionResponse.resolution.from, 'txt')
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.$q.loading.hide()
       }
     },
     isArray (myArray) {

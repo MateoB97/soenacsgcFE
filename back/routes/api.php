@@ -82,7 +82,7 @@ Route::group(['prefix' => 'enterprises'], function(){
     Route::get('/admin/adminEnterprises', 'enterpriseController@adminIndex');
     Route::get('/admin/showAdmin/{id}', 'enterpriseController@showAdmin');
     Route::get('/admin/confirmEnterpriseDian/{id}', 'enterpriseController@confirmEnterpriseDian');
-    Route::post('/admin/downloadTxt/{request}', 'enterpriseController@downloadTxt');
+    Route::post('/admin/downloadTxt', 'enterpriseController@downloadTxt');
 
     Route::get('', 'enterpriseController@index');
     Route::get('{id}', 'enterpriseController@show');
@@ -99,7 +99,7 @@ Route::group(['prefix' => 'enterprises'], function(){
     Route::get('/certificateUp/{id}', 'enterpriseController@certificateUp');
     Route::get('/enterpriseUpdate/{id}', 'enterpriseController@enterpriseUpdating');
     // Route::post('/soenac/resolutions', 'enterpriseController@resolutions');
-    Route::post('/soenac/resolutions/{request}', 'enterpriseController@resolutions');
+    Route::post('/soenac/resolutions', 'enterpriseController@resolutions');
 });
 // ruta para token maestro
 Route::group(['prefix' => 'generals'], function(){

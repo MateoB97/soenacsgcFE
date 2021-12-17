@@ -25,11 +25,11 @@ class Enterprise extends Migration
             $table->integer('type_organization_id');
             $table->integer('type_regime_id');
             $table->integer('type_liability_id');
-            $table->string('software_id');
-            $table->integer('software_pin');
-            $table->string('software_url');
-            $table->text('certificate');
-            $table->string('certificate_password');
+            $table->string('software_id')->nullable();
+            $table->integer('software_pin')->nullable();
+            $table->string('software_url')->nullable();
+            $table->text('certificate')->nullable();
+            $table->string('certificate_password')->nullable();
             $table->integer('type_environments');
             $table->integer('ceo_document');
             $table->text('last_software_response')->nullable();
