@@ -146,14 +146,16 @@ class enterpriseController extends Controller
         $enterprise = enterprise::find(intval($id));
 
         $datos = [["tp_dc"=>1,"prefix"=>"SETP"],["tp_dc"=>5,"prefix"=>"SENC"],["tp_dc"=>6,"prefix"=>"SEND"]];
-        $disk = 'local';
-        $name = 'certificadoHab.txt';
+        // $disk = 'local';
+        // $name = 'certificadoHab.txt';
 
-        if (Storage::disk($disk)->exists($name)) {
-            $eliminar = Storage::delete($name);
-        }
+        // if (Storage::disk($disk)->exists($name)) {
+        //     $eliminar = Storage::delete($name);
+        // }
+        $contents = '';
+        $res = new stdClass();
 
-        for ($i=0; $i < 3; $i++) {
+        for ($i=0; $i <= 2; $i++) {
 
             $data = new stdClass();
 
@@ -171,48 +173,52 @@ class enterpriseController extends Controller
 
             $authorization = 'Authorization: Bearer '.$enterprise->token;
 
-            $response = Tools::http_post($urlPost, $data, $authorization);
+            $response = json_decode(Tools::http_post($urlPost, $data, $authorization));
 
-            if (Storage::disk($disk)->exists($name)) {
-                $escribir = Storage::append($name, $response);
-                // dd($escribir);
-            } else {
-                $crear = Storage::disk($disk)->put($name, $response, 'public');
-                // dd($crear);
-            }
+            $res->mensajes[$i] = $response->message;
+            $res->resolutions[$i]["doc"] = $response->resolution;
 
-            if($i>=2) {
-                $contents = Storage::get($name);
+            if ($i>=2) {
+                // $contents = Storage::get($name);
+                $contents .= json_encode($res);
 
                 return $contents;
             }
-
         }
     }
     /** Creación facturas de prueba---revisar */
-    public function facPruebas($id, $dataNumber = 0, $contents = '')
+    public function facPruebas($id, $consec)
     {
         $enterprise = enterprise::find(intval($id));
 
-        $idSoft = $enterprise->software_id;
+        $idTest = $enterprise->IdTests;
 
-        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/invoice/'.$idSoft;
+        $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/invoice/'.$idTest;
 
-        $data = array();
+        $contents = '';
 
-        if ($dataNumber != 0) {
-            $data["number"] = $dataNumber;
-        } else {
-            $data["number"] = 990000000;
-        }
-        $data["type_document_id"] = 1;
-        $data["customer"] = (object) [
+        $data = new stdClass();
+
+        $data->number = $consec;
+
+        // dd($data->number);
+        $data->environment = (object) [
+            "type_environment_id" => $enterprise->type_environments,
+            "id" => $enterprise->software_id,
+            "pin" => $enterprise->software_pin,
+            "url" => $enterprise->software_url
+        ];
+
+        $data->sync = false;
+
+        $data->type_document_id = 1;
+        $data->customer = (object) [
             "identification_number" => 1094925334,
             "name" => "Frank Aguirre",
             "email" => "faguirre@soenac.com",
             "municipality_id" => 1
         ];
-        $data["legal_monetary_totals"]  = (object) [
+        $data->legal_monetary_totals  = (object) [
             "line_extension_amount"  => "300000.00",
             "tax_exclusive_amount"  => "300000.00",
             "tax_inclusive_amount"  => "357000.00",
@@ -220,7 +226,7 @@ class enterpriseController extends Controller
             "charge_total_amount"  => "0.00",
             "payable_amount"  => "357000.00"
         ];
-        $data["invoice_lines"] = [(object)[
+        $data->invoice_lines = [(object)[
             "unit_measure_id" => 642,
             "invoiced_quantity" => "1.000000",
             "line_extension_amount" => "300000.00",
@@ -240,79 +246,45 @@ class enterpriseController extends Controller
 
         $authorization = 'Authorization: Bearer '.$enterprise->token;
 
-        $factura = Tools::http_post($urlPost, $data, $authorization);
-
-        $suma = $data["number"];
-
-        // $disk = 'local';
-
-        // $name = 'facPruebaConfirm.txt';
-
-        // if (Storage::disk($disk)->exists($name) && $data["number"] === 990000000) {
-        //     $eliminar = Storage::delete($name);
-        //     $crear = Storage::disk($disk)->put($name, $factura, 'public');
-        //     $escribir = Storage::append($name, $factura);
-        //     // dd('eliminar');
-        // } else if (!Storage::disk($disk)->exists($name) && $data["number"] === 990000000) {
-        //     $crear = Storage::disk($disk)->put($name, $factura, 'public');
-        //     // dd('crear');
-        // } else if (Storage::disk($disk)->exists($name) && $data["number"] > 990000000) {
-        //     $escribir = Storage::append($name, $factura);
-        //     // dd('escribir');
-        // }
-        $contents .= $factura;
-
-        $factura = json_decode($factura);
-
-        // if ($factura->zip_key && Storage::disk($disk)->exists($name)) {
-        if ($factura->zip_key && $contents) {
-            $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/status/zip/'.$factura->zip_key;
-            $dataZip = array();
-            $codigoZip = json_decode(Tools::http_post($urlPost, $dataZip, $authorization));
-            // dd($codigoZip);
-
-            if ($codigoZip->is_valid === true) {
-                $mensaje = new stdClass();
-                $mensaje->status_description = $codigoZip->status_description;
-                $mensaje->status_message = $codigoZip->status_message;
-                $mensaje->zip_key = $codigoZip->zip_key;
-                $mensaje->uuid = $codigoZip->uuid;
-                $mensaje->number = $codigoZip->number;
-
-                // $escribir = Storage::append($name, json_encode($mensaje));
-                $contents .= json_encode($mensaje);
-
-                if ($suma === 990000010 ) {
-                    // $contents = Storage::get($name);
-                    // dd(Storage::get($name));
-                    return $contents;
-                } else if ( $contents && $suma < 990000010){
-                    $suma++;
-                    $this->facPruebas($id, $suma, $contents);
-                }
-            } else if ($codigoZip->is_valid === false || $codigoZip->is_valid === null) {
-                $mensaje = new stdClass();
-                $mensaje->status_description = $codigoZip->status_description;
-                $mensaje->status_message = $codigoZip->status_message;
-                $mensaje->zip_key = $codigoZip->zip_key;
-                $mensaje->uuid = $codigoZip->uuid;
-                $mensaje->number = $codigoZip->number;
-
-                // $escribir = Storage::append($name, json_encode($mensaje));
-                $contents .= json_encode($mensaje);
-
-                if ($suma === 990000010) {
-                    // $contents = Storage::get($name);
-                    // dd('hola1');
-                    return $contents;
-                } else if($contents && $suma < 990000010) {
-                    $suma++;
-                    // dd('hola2');
-                    $this->facPruebas($id, $suma, $contents);
-                }
+        $factura = json_decode(Tools::http_post($urlPost, $data, $authorization));
+        // dd($factura);
+        // return json_encode($factura);
+        if (isset($factura->message)) {
+            $contents .= json_encode($factura);
+            return $contents;
+        } else if (isset($factura->number)) {
+            $msjFac = new stdClass();
+            $msjFac->is_valid                          = $factura->is_valid;
+            $msjFac->number                            = $factura->number;
+            $msjFac->uuid                              = $factura->uuid;
+            $msjFac->zip_key                           = $factura->zip_key;
+            $msjFac->status_description                = $factura->status_description;
+            $msjFac->status_message                    = $factura->status_message;
+            $msjFac->errors_messages                   = $factura->errors_messages;
+            $msjFac->qr_code                           = $factura->qr_code;
+            $msjFac->application_response_base64_bytes = $factura->application_response_base64_bytes;
+            $contents .= json_encode($msjFac);
+            // dd($factura->zip_key);
+            if ($factura->zip_key !== null) {
+                sleep(20);
+                $urlPost = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/status/zip/'.$factura->zip_key;
+                $dataZip = false;
+                $codigoZip = json_decode(Tools::http_post($urlPost, $dataZip, $authorization));
+                // dd($codigoZip->message);
+                $msjZip = new stdClass();
+                $msjZip->status_description = $codigoZip->status_description;
+                $msjZip->status_message     = $codigoZip->status_message;
+                $msjZip->zip_key            = $codigoZip->zip_key;
+                $msjZip->uuid               = $codigoZip->uuid;
+                $msjZip->number             = $codigoZip->number;
+                // dd($msjZip);
+                $contents .= json_encode($msjZip);
+                // $contents .= $codigoZip;
+                return $contents;
+            } else {
+                return $contents;
             }
         }
-
     }
 
     /**
@@ -384,13 +356,12 @@ class enterpriseController extends Controller
         }
     }
     /** Creación de la resolucion */
-    public function resolutions(Request $r)
+    public function resolutions(Request $request)
     {
-        // dd($r);
-        $request = json_decode($r,false);
+
         $enterprise = enterprise::find(intval($request->id));
         // $general = json_decode(general::all()->first(),false);
-
+        // dd($enterprise);
         $resolutionData = new stdClass();
 
         $resolutionData->type_document_id  = intval($request->type_document_id);
@@ -513,6 +484,7 @@ class enterpriseController extends Controller
     public function enterpriseUpdating($id)
     {
         $enterprise = enterprise::find(intval($id));
+        $general = general::all()->first();
 
         $data = new stdClass();
 
@@ -531,7 +503,8 @@ class enterpriseController extends Controller
 
         $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/'.$enterprise->nit;
 
-        $authorization = 'Authorization: Bearer '.$enterprise->token;
+        // $authorization = 'Authorization: Bearer '.$enterprise->token;
+        $authorization = 'Authorization: Bearer '.$general->masterToken;
 
         $response = Tools::http_put($urlPut, $data, $authorization);
 

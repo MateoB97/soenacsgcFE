@@ -36,6 +36,7 @@ class enterprise extends Model
         'last_update_enterprise_response',
         'nit',
         'token',
+        'IdTests',
         'municipality_id'
     ];
 
@@ -61,6 +62,7 @@ class enterprise extends Model
         'last_update_enterprise_response',
         'nit',
         'token',
+        'IdTests',
         'municipality_id'
     );
 

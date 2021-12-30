@@ -40,18 +40,29 @@ class Tools extends Model
         return $response;
     }
 
-    public static function http_post($url, $body, $authorization){
+    public static function http_post($url, $body = false, $authorization){
 
         $ch = curl_init();
 
-		$curlConfig = [
-	        CURLOPT_URL            => $url,
-	        CURLOPT_CUSTOMREQUEST  => "POST",
-	        CURLOPT_RETURNTRANSFER => true,
-	        CURLOPT_HTTPHEADER => TRUE,
-	        CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
-	        CURLOPT_POSTFIELDS => json_encode($body)
-	    ];
+        if ($body !== false) {
+            $curlConfig = [
+                CURLOPT_URL            => $url,
+                CURLOPT_CUSTOMREQUEST  => "POST",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => TRUE,
+                CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
+                CURLOPT_POSTFIELDS => json_encode($body)
+            ];
+        } else if ($body === false) {
+            $curlConfig = [
+                CURLOPT_URL            => $url,
+                CURLOPT_CUSTOMREQUEST  => "POST",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => TRUE,
+                CURLOPT_HTTPHEADER => array('Content-Type:application/json', 'Accept:application/json', $authorization),
+            ];
+        }
+
 	    curl_setopt_array($ch, $curlConfig);
         // dd($curlConfig);
 
@@ -103,7 +114,7 @@ class Tools extends Model
         return $arrayBuckets;
     }
 
-        public static function toCollect($collect){
+    public static function toCollect($collect){
         $details = collect($collect)->map(function ($item) {
             return (object) $item;
         });

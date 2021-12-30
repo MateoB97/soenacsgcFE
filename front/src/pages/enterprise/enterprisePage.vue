@@ -61,6 +61,9 @@
             <div class="col-3">
               <q-input type="text" v-model="storeItems.token" label="Token"/>
             </div>
+            <div class="col-3">
+              <q-input type="text" v-model="storeItems.IdTests" label="ID Tests"/>
+            </div>
         </div>
         <div class="row q-mt-md">
             <div class="col-2">
@@ -169,6 +172,7 @@ export default {
       this.storeItems.last_update_enterprise_response = this.storeItems.last_update_enterprise_response ? this.storeItems.last_update_enterprise_response : ''
       this.storeItems.municipality_id = this.storeItems.municipality_id ? this.storeItems.municipality_id : ''
       this.storeItems.token = this.storeItems.token ? this.storeItems.token : ''
+      this.storeItems.IdTests = this.storeItems.IdTests ? this.storeItems.IdTests : ''
     },
     postEdit () {
     },

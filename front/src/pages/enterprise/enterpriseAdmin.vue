@@ -61,7 +61,7 @@
                         class="q-ml-xs"
                         color="orange-5"
                         @click="enterpriseUpdating(adminData.id)"
-                        label="Actualizar DIAN"
+                        label="Actualizar"
                       />
                       <p>¿Actualizar empresa en el sistema DIAN?</p>
                     </div>
@@ -81,7 +81,7 @@
                         class="q-ml-xs"
                         color="orange-5"
                         @click="softInfo(adminData.id)"
-                        label="Subir información"
+                        label="Actualizar Software"
                       />
                       <p>¿Confirmar datos del software?</p>
                     </div>
@@ -101,7 +101,7 @@
                         class="q-ml-xs"
                         color="orange-5"
                         @click="certificateUp(adminData.id)"
-                        label="Subir certificado"
+                        label="Actualizar Certificado"
                       />
                       <p>¿Crear certificado?</p>
                     </div>
@@ -115,49 +115,52 @@
           <div class="col-12" style="max-width: 800px"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="productionNumbers(adminData.id), Diag1 = true">Ver numeros de produccion</q-btn></div>
           <div class="col-12" style="max-width: 800px" v-if="adminData.token !== null"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="verEmpresa(adminData.id), Diag3 = true">Ver empresa soenac</q-btn></div>
           <div class="col-12" style="max-width: 800px" v-if="adminData.type_environments === 'Pruebas'"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="resolucionHab(adminData.id), Diag4 = true">Resolución facturas de prueba</q-btn></div>
+          <div class="col-12" style="max-width: 800px" v-if="adminData.type_environments === 'Pruebas'"><q-btn class="q-mx-xl btn-limon" style="width: 700px" @click="facPruebas(adminData.id)">Facturas de prueba: {{consecFacP}}</q-btn></div>
           <q-dialog v-model="Diag1">
-            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
-              <q-card-section class="justify-center q-pa-md">
-                <div class="text-h5 absolute-center q-mx-md">Prefijos</div>
-              </q-card-section>
-              <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 700px">
-                <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 650px; height: 50px" v-for = "(item, key) in resolutionData" :key="item.id">
-                  <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length >= 1">
-                    <q-item-section class="col-12" style="max-width: 650px">
-                      Prefijo: {{item.Prefix}} || Resolución: {{item.ResolutionNumber}} || Rango: {{item.FromNumber}} - {{item.ToNumber}}
-                    </q-item-section>
-                  </q-item>
-                  <q-item tag="label" v-ripple v-if="item.mensaje">
-                    <q-item-section class="col-12" style="max-width: 650px">
-                      {{item.mensaje}}
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-card-section>
-              <q-card-actions class="justify-center">
-                <q-btn @click="selectDocResolution('FC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">FC</q-btn>
-                <q-btn @click="selectDocResolution('NC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">NC</q-btn>
-                <q-btn @click="selectDocResolution('ND')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">ND</q-btn>
-              </q-card-actions>
+            <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 700px; max-width: 1400px">
+              <div class="row">
+                <div class="col-6 q-my-md">
+                  <q-card-section class="justify-center q-pa-md q-my-md">
+                    <div class="text-h5 absolute-center q-mx-md">Prefijos</div>
+                  </q-card-section>
+                  <q-card-section class="relative-position q-mx-md q-pa-md q-my-md" style="width: 600px">
+                    <q-list dense bordered padding class="q-mx-sm rounded-borders" style="width: 500px; height: 60px" v-for = "(item, key) in resolutionData" :key="item.id">
+                      <q-item clickable tag="label" v-ripple @click="checkResolution(key)" v-if="Object.keys(resolutionData).length >= 1">
+                        <q-item-section class="col-12" style="max-width: 650px">
+                          Prefijo: {{item.Prefix}} || Resolución: {{item.ResolutionNumber}} || Rango: {{item.FromNumber}} - {{item.ToNumber}}
+                        </q-item-section>
+                      </q-item>
+                      <q-item tag="label" v-ripple v-if="item.mensaje">
+                        <q-item-section class="col-12" style="max-width: 650px">
+                          {{item.mensaje}}
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-card-section>
+                  <q-card-actions class="justify-center">
+                    <q-btn @click="selectDocResolution('FC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">FC</q-btn>
+                    <q-btn @click="selectDocResolution('NC')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">NC</q-btn>
+                    <q-btn @click="selectDocResolution('ND')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">ND</q-btn>
+                  </q-card-actions>
+                </div>
+                <div class="col-6 q-my-md" v-if= " typeof resolutionResponse !== 'undefined' ">
+                  <q-card-section class="justify-center q-pa-md q-my-md">
+                    <div class="text-h5 absolute-center q-mx-md">Info resolución</div>
+                  </q-card-section>
+                  <q-card-section class="relative-position q-mx-md q-pa-md q-my-md" style="width: 600px" v-for= "(item, index) in resolutionResponse.content" :key= "index">
+                    {{item}}
+                  </q-card-section>
+                  <q-card-actions class="justify-center">
+                    <q-btn @click="downloadFile(resolutionDownload, adminData.business_name, 'txt')" class="q-mx-xl btn-limon" v-if="resolutionDocOption">Descargar el archivo</q-btn>
+                  </q-card-actions>
+                </div>
+              </div>
             </q-card>
           </q-dialog>
-          <q-dialog v-model="Diag2">
+          <!-- <q-dialog v-model="Diag2">
             <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
-              <q-card-section class="row items-center q-pb-none">
-                <q-space />
-                <q-btn icon="close" flat round dense v-close-popup />
-              </q-card-section>
-              <q-card-section class="justify-center q-pa-md">
-                <div class="text-h5 absolute-center q-mx-md">Info de la resolución</div>
-              </q-card-section>
-              <q-card-section class="relative-position q-mx-md q-pa-md" style="width: 600px">
-                {{resolutionResponse}}
-              </q-card-section>
-              <q-card-actions class="relative-position justify-center q-pa-md">
-                <q-btn @click="this.downloadFile(sessionStorage.getItem('resolutionFile'), this.adminData.business_name + this.resolutionResponse.resolution.prefix + this.resolutionResponse.resolution.to + '-' + this.resolutionResponse.resolution.from, 'txt')" class="q-mx-xl absolute-center btn-limon">Descargar</q-btn>
-              </q-card-actions>
             </q-card>
-          </q-dialog>
+          </q-dialog> -->
           <q-dialog v-model="Diag3">
             <q-card class="col-md-auto q-pa-md overflow-auto justify-center content-center" style="max-height: 600px; max-width: 800px">
               <q-card-section class="row items-center q-pb-none">
@@ -191,12 +194,11 @@
                 <q-space />
                 <q-btn icon="close" flat round dense v-close-popup />
               </q-card-section>
-              <q-card-section class="q-ma-md q-pa-md" style="width: 600px">
-                <div>{{resolucionPrueba}}</div>
+              <q-card-section class="q-ma-md q-pa-md" style="width: 600px" v-for = "(resArray, resKey) in resolucionPrueba" :key="resKey">
+                <div v-for = "(resItem, itemKey) in resArray.doc" :key="itemKey">
+                  <b>{{itemKey}}</b> : {{resItem}}
+                </div>
               </q-card-section>
-              <q-card-actions class="relative-position justify-center q-pa-md">
-                <q-btn @click="facPruebas(adminData.id)" class="q-mx-xl absolute-center btn-limon">Facturación de prueba</q-btn>
-              </q-card-actions>
             </q-card>
           </q-dialog>
         </div>
@@ -220,13 +222,42 @@ export default {
   },
   created: function () {
     this.globalGetForSelect('api/enterprises/admin/adminEnterprises', 'options')
+    if (JSON.parse(sessionStorage.getItem('resolutionFile')) === null) {
+      this.resolutionResponse = ''
+    } else {
+      this.resolutionResponse = JSON.parse(sessionStorage.getItem('resolutionFile'))
+      if (Object.hasOwnProperty.call(this.resolutionResponse, 'content') && typeof this.resolutionResponse !== 'undefined') {
+        for (const key in this.resolutionResponse.content) {
+          if (Object.hasOwnProperty.call(this.resolutionResponse.content, key)) {
+            const element = this.resolutionResponse.content[key]
+            this.resolutionDownload += element
+          }
+        }
+        // console.log(this.resolutionResponse, 'resRespons')
+        // console.log(this.resolutionDownload, 'resDown')
+      }
+    }
   },
   mounted: function () {
   },
   beforeUpdate: function () {
-    // console.log(this.adminData)
   },
   updated: function () {
+    // if (JSON.parse(sessionStorage.getItem('resolutionFile')) === null) {
+    //   this.resolutionResponse = ''
+    // } else {
+    //   this.resolutionResponse = JSON.parse(sessionStorage.getItem('resolutionFile'))
+    //   if (Object.hasOwnProperty.call(this.resolutionResponse, 'content') && typeof this.resolutionResponse !== 'undefined') {
+    //     for (const key in this.resolutionResponse.content) {
+    //       if (Object.hasOwnProperty.call(this.resolutionResponse.content, key)) {
+    //         const element = this.resolutionResponse.content[key]
+    //         this.resolutionDownload += element
+    //       }
+    //     }
+    //     // console.log(this.resolutionResponse, 'resRespons')
+    //     // console.log(this.resolutionDownload, 'resDown')
+    //   }
+    // }
   },
   data: function () {
     return {
@@ -251,10 +282,12 @@ export default {
       checkedResolution: {},
       resolutionDocOption: false,
       resolutionResponse: {},
+      resolutionDownload: '',
       oldPrefix: '',
       // respuesta doc resolución prueba
-      resolucionPrueba: '',
+      resolucionPrueba: [],
       // facturas de prueba
+      consecFacP: 990000026,
       facturasPruebas: '',
       // respuesta verdatos soenac-empresa
       responseEnterpriseData: { mensaje: '' },
@@ -339,11 +372,23 @@ export default {
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/admin/confirmEnterpriseDian/' + id)
         this.$q.notify({
-          message: data.dada,
+          message: data.data.message,
           color: 'primary',
           multiLine: true
         })
-        console.log(data.data)
+        let re = new RegExp('exito')
+        if (re.test(data.message)) {
+          let company = data.company
+          let nameFile = 'creacionInfo' + company.id + '_' + company.identification_number
+          let sessionFile = data.token
+          sessionStorage.setItem(nameFile, sessionFile)
+        } else {
+          this.$q.notify({
+            message: data.errors.nit[0],
+            color: 'primary',
+            multiLine: true
+          })
+        }
       } catch (error) {
         console.log(error)
       } finally {
@@ -356,6 +401,12 @@ export default {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
+        console.log(data)
+        this.$q.notify({
+          message: data.data.message,
+          color: 'primary',
+          multiLine: true
+        })
         console.log(data)
       } catch (error) {
         console.log(error)
@@ -373,7 +424,12 @@ export default {
         // } else if (data.mensaje === 'Respuesta de software negativa') {
         //   this.adminData.last_software_response = 'Aun sin respuesta'
         // }
-        console.log(data)
+        this.$q.notify({
+          message: data.data.message,
+          color: 'primary',
+          multiLine: true
+        })
+        // console.log(data)
       } catch (error) {
         console.log(error)
       } finally {
@@ -385,7 +441,13 @@ export default {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/certificateUp' + '/' + id)
-        console.log(data)
+
+        this.$q.notify({
+          message: data.data.message,
+          color: 'primary',
+          multiLine: true
+        })
+        // console.log(data)
       } catch (error) {
         console.log(error)
       } finally {
@@ -453,7 +515,7 @@ export default {
         this.checkedResolution.id = this.adminData.id
         // request = JSON.stringify(this.checkedResolution)
         request = this.checkedResolution
-        console.log(request)
+        console.log(request, 'requestRes')
         let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions', request)
         // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolutions/' + request)
         // verificar el data
@@ -468,29 +530,32 @@ export default {
         //     color: 'green'
         //   })
         // }
+        console.log(data, 'responseRes')
         this.rellenadoTxt(data.data)
         // if (data) { // falta saber como se recibe la data
         //   this.Diag2 = true
         // }
-        this.Diag2 = true
+        // this.Diag2 = true
       } catch (error) {
         console.log(error)
       } finally {
         this.$q.loading.hide()
       }
     },
-    // Boton rellenado info resoluciones
+    // Boton rellenado info resoluciones para descarga
     async rellenadoTxt (data) {
       this.$q.loading.show()
       try {
         let request
-        data = JSON.parse(data) // *************
-        let resolution = Object.entries(data.resolution)
-        // this.resolutionResponse = JSON.parse(data.data) // ******************
-        // this.adminData.certificate = this.adminData.certificate
-        let admin = Object.entries(this.adminData)
-        let concat = resolution.concat(admin)
-        request = Object.fromEntries(concat)
+        data = JSON.parse(data)
+        console.log(data, 'dataParse')
+        // let resolution = Object.entries(data.resolution)
+
+        // let admin = Object.entries(this.adminData)
+        // let concat = resolution.concat(admin)
+        // request = Object.fromEntries(concat)
+        request = data.resolution
+        console.log(request, 'requestRelleno')
         // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/', request)
         switch (request.type_document_id) {
           case 1:
@@ -505,36 +570,48 @@ export default {
         }
         let content
 
-        content = 'Nombre: '.request.business_name + '<br />'
-        content += 'Token: '.request.token + '<br />'
-        content += 'Tipo de documento: '.request.tipoDocNom + '<br />'
+        content += 'Token: ' + request.token + '<br />'
+        content += 'Tipo de documento: ' + request.tipoDocNom + '<br />'
         content += 'Datos de la resolución: ' + '<br />'
-        content += 'Tipo de documento '.request.type_document_id + '<br />'
-        content += 'Prefijo '.request.prefix + '<br />'
-        content += 'Resolución '.request.resolution + '<br />'
-        content += 'Fecha resolución '.request.resolution_date + '<br />'
-        content += 'Clave técnica '.request.technical_key + '<br />'
-        content += 'Consecutivo desde '.request.from + '<br />'
-        content += 'Consecutivo hasta '.request.to + '<br />'
-        content += 'Fecha desde '.request.date_from + '<br />'
-        content += 'Actualizado '.request.updated_at + '<br />'
-        content += 'Creado '.request.created_at + '<br />'
-        content += 'ID '.request.id + '<br />'
-        content += 'Numero '.request.number + '<br />'
-        content += 'Consecutivo siguiente '.request.next_con + '<br />'
+        content += 'Tipo de documento ' + request.type_document_id + '<br />'
+        content += 'Prefijo ' + request.prefix + '<br />'
+        content += 'Resolución ' + request.resolution + '<br />'
+        content += 'Fecha resolución ' + request.resolution_date + '<br />'
+        content += 'Clave técnica ' + request.technical_key + '<br />'
+        content += 'Consecutivo desde ' + request.from + '<br />'
+        content += 'Consecutivo hasta ' + request.to + '<br />'
+        content += 'Fecha desde ' + request.date_from + '<br />'
+        content += 'Actualizado ' + request.updated_at + '<br />'
+        content += 'Creado ' + request.created_at + '<br />'
+        content += 'ID ' + request.id + '<br />'
+        content += 'Numero ' + request.number + '<br />'
+        content += 'Consecutivo siguiente ' + request.next_consecutive + '<br />'
 
         let nameFile = 'resolutionFile'
         let sessionFile = sessionStorage.getItem(nameFile)
         if (sessionFile === null) {
-          this.resolutionResponse.content = content
-          sessionStorage.setItem(nameFile, content)
+          let sessionContent = {}
+          sessionContent.resolution = {}
+          sessionContent.resolution[request.prefix] = request // consultar si la creación de colecciones indexadas funciona de esta manera
+          sessionContent.content = {}
+          sessionContent.content[request.prefix] = content
+          sessionStorage.setItem(nameFile, JSON.stringify(sessionContent))
         } else {
           let sessionContent = sessionStorage.getItem(nameFile)
-          sessionContent += content
-          sessionStorage.setItem(nameFile, sessionContent)
-          this.resolutionResponse.content = sessionContent
+          sessionContent = JSON.parse(sessionContent)
+          sessionContent.resolution[request.prefix] = request
+          sessionContent.content[request.prefix] = content
+          sessionStorage.setItem(nameFile, JSON.stringify(sessionContent))
+          console.log(sessionContent, 'suma de prefijo')
         }
-        console.log(data)
+        this.resolutionResponse = JSON.parse(sessionStorage.getItem('resolutionFile'))
+        for (const key in this.resolutionResponse.content) {
+          if (Object.hasOwnProperty.call(this.resolutionResponse.content, key)) {
+            const element = this.resolutionResponse.content[key]
+            this.resolutionDownload += element
+          }
+        }
+        console.log(this.resolutionResponse)
       } catch (error) {
         console.log(error)
       } finally {
@@ -548,7 +625,19 @@ export default {
         let id = this.adminData.id
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/resolucionPrueba/' + id)
         console.log(data)
-        this.resolucionPrueba = data.data
+        let prefijos = ''
+        for (let i = 0; i < data.data.resolutions.length; i++) {
+          prefijos += '-' + data.data.resolutions[i].doc.prefix
+        }
+
+        this.$q.notify({
+          message: data.data.mensajes.length + ' - ' + 'resoluciones fueron creadas, con prefijos' + prefijos,
+          color: 'primary',
+          multiLine: true
+        })
+
+        // console.log(data)
+        this.resolucionPrueba = data.data.resolutions
       } catch (error) {
         console.log(error)
       } finally {
@@ -560,9 +649,50 @@ export default {
       this.$q.loading.show()
       try {
         let id = this.adminData.id
-        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/facPruebas/' + id)
-        console.log(data)
-        data.data = this.facturasPruebas
+        let consec = this.consecFacP
+        let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/soenac/facPruebas/' + id + '/' + consec)
+
+        if (typeof data.data !== 'undefined') {
+          this.consecFacP++
+          console.log(data.data)
+          if (typeof data.data.errors !== 'undefined') {
+            let contentErr = ''
+            for (let i = 0; i <= data.data.errors.number.length - 1; i++) {
+              this.$q.notify({
+                message: data.data.errors.number[i],
+                color: 'primary',
+                multiLine: true
+              })
+              contentErr += data.data.errors.number[i]
+            }
+            sessionStorage.setItem('facPruebasErr' + consec, contentErr)
+          } else if (typeof data.data === 'string') {
+            // this.consecFacP++
+            let contentDone = data.data
+            sessionStorage.setItem('facPruebasDone' + consec, contentDone)
+            this.$q.notify({
+              message: data.data,
+              color: 'primary',
+              multiLine: true
+            })
+          } else if (data.data.is_valid === true) {
+            // this.consecFacP++
+            let contentDone = JSON.stringify(data.data)
+            sessionStorage.setItem('facPruebasDone' + consec, contentDone)
+            this.$q.notify({
+              message: data.data.status_description + '---' + data.data.status_message,
+              color: 'primary',
+              multiLine: true
+            })
+          }
+          this.facturasPruebas = data.data
+        } else {
+          this.$q.notify({
+            message: 'Data undefined',
+            color: 'primary',
+            multiLine: true
+          })
+        }
       } catch (error) {
         console.log(error)
       } finally {
@@ -584,7 +714,13 @@ export default {
           let newPrefix2
           let oldPrefix2 = this.checkedResolution.Prefix
           this.oldPrefix = oldPrefix2
-          newPrefix2 = oldPrefix2.slice(0, -2) + 'NC'
+          if ((this.checkedResolution.Prefix).length < 3) {
+            newPrefix2 = oldPrefix2 + 'NC'
+          } else if ((this.checkedResolution.Prefix).length === 3) {
+            newPrefix2 = oldPrefix2.slice(0, -1) + 'NC'
+          } else if ((this.checkedResolution.Prefix).length === 4) {
+            newPrefix2 = oldPrefix2.slice(0, -2) + 'NC'
+          }
           this.checkedResolution.Prefix = newPrefix2
           this.resolutions()
           break
@@ -593,7 +729,13 @@ export default {
           let newPrefix3
           let oldPrefix3 = this.checkedResolution.Prefix
           this.oldPrefix = oldPrefix3
-          newPrefix3 = oldPrefix3.slice(0, -2) + 'ND'
+          if ((this.checkedResolution.Prefix).length < 3) {
+            newPrefix3 = oldPrefix3 + 'ND'
+          } else if ((this.checkedResolution.Prefix).length === 3) {
+            newPrefix3 = oldPrefix3.slice(0, -1) + 'ND'
+          } else if ((this.checkedResolution.Prefix).length === 4) {
+            newPrefix3 = oldPrefix3.slice(0, -2) + 'ND'
+          }
           this.checkedResolution.Prefix = newPrefix3
           this.resolutions()
           break
