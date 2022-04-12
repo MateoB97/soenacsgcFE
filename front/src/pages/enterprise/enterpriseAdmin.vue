@@ -243,6 +243,7 @@ export default {
   beforeUpdate: function () {
   },
   updated: function () {
+    console.log(this.adminData, 'adminDataCreated')
     // if (JSON.parse(sessionStorage.getItem('resolutionFile')) === null) {
     //   this.resolutionResponse = ''
     // } else {
@@ -401,7 +402,7 @@ export default {
       this.$q.loading.show()
       try {
         let data = await axios.get(this.$store.state.jhsoft.url + 'api/enterprises/enterpriseUpdate' + '/' + id)
-        console.log(data)
+        console.log(data, 'updating')
         this.$q.notify({
           message: data.data.message,
           color: 'primary',
@@ -549,14 +550,11 @@ export default {
         let request
         data = JSON.parse(data)
         console.log(data, 'dataParse')
-        // let resolution = Object.entries(data.resolution)
 
-        // let admin = Object.entries(this.adminData)
-        // let concat = resolution.concat(admin)
-        // request = Object.fromEntries(concat)
         request = data.resolution
+        request.token = this.adminData.token
         console.log(request, 'requestRelleno')
-        // let data = await axios.post(this.$store.state.jhsoft.url + 'api/enterprises/admin/downloadTxt/', request)
+
         switch (request.type_document_id) {
           case 1:
             request.tipoDocNom = 'Factura'
@@ -568,31 +566,33 @@ export default {
             request.tipoDocNom = 'Nota debito'
             break
         }
-        let content
+        let content = ''
+        let saltoLinea = '\n\r'
+        // let saltoLinea = '\r\n\r\n'
 
-        content += 'Token: ' + request.token + '<br />'
-        content += 'Tipo de documento: ' + request.tipoDocNom + '<br />'
-        content += 'Datos de la resolución: ' + '<br />'
-        content += 'Tipo de documento ' + request.type_document_id + '<br />'
-        content += 'Prefijo ' + request.prefix + '<br />'
-        content += 'Resolución ' + request.resolution + '<br />'
-        content += 'Fecha resolución ' + request.resolution_date + '<br />'
-        content += 'Clave técnica ' + request.technical_key + '<br />'
-        content += 'Consecutivo desde ' + request.from + '<br />'
-        content += 'Consecutivo hasta ' + request.to + '<br />'
-        content += 'Fecha desde ' + request.date_from + '<br />'
-        content += 'Actualizado ' + request.updated_at + '<br />'
-        content += 'Creado ' + request.created_at + '<br />'
-        content += 'ID ' + request.id + '<br />'
-        content += 'Numero ' + request.number + '<br />'
-        content += 'Consecutivo siguiente ' + request.next_consecutive + '<br />'
+        content += 'Token: ' + request.token + saltoLinea
+        content += 'Tipo de documento: ' + request.tipoDocNom + saltoLinea
+        content += 'Datos de la resolución: ' + saltoLinea
+        content += 'Tipo de documento ' + request.type_document_id + saltoLinea
+        content += 'Prefijo ' + request.prefix + saltoLinea
+        content += 'Resolución ' + request.resolution + saltoLinea
+        content += 'Fecha resolución ' + request.resolution_date + saltoLinea
+        content += 'Clave técnica ' + request.technical_key + saltoLinea
+        content += 'Consecutivo desde ' + request.from + saltoLinea
+        content += 'Consecutivo hasta ' + request.to + saltoLinea
+        content += 'Fecha desde ' + request.date_from + saltoLinea
+        content += 'Actualizado ' + request.updated_at + saltoLinea
+        content += 'Creado ' + request.created_at + saltoLinea
+        content += 'ID ' + request.id + saltoLinea
+        content += 'Numero ' + request.number + saltoLinea
+        content += 'Consecutivo siguiente ' + request.next_consecutive + saltoLinea
 
         let nameFile = 'resolutionFile'
         let sessionFile = sessionStorage.getItem(nameFile)
         if (sessionFile === null) {
           let sessionContent = {}
           sessionContent.resolution = {}
-          sessionContent.resolution[request.prefix] = request // consultar si la creación de colecciones indexadas funciona de esta manera
+          sessionContent.resolution[request.prefix] = request
           sessionContent.content = {}
           sessionContent.content[request.prefix] = content
           sessionStorage.setItem(nameFile, JSON.stringify(sessionContent))
@@ -604,6 +604,8 @@ export default {
           sessionStorage.setItem(nameFile, JSON.stringify(sessionContent))
           console.log(sessionContent, 'suma de prefijo')
         }
+        this.resolutionResponse = {}
+        this.resolutionDownload = ''
         this.resolutionResponse = JSON.parse(sessionStorage.getItem('resolutionFile'))
         for (const key in this.resolutionResponse.content) {
           if (Object.hasOwnProperty.call(this.resolutionResponse.content, key)) {

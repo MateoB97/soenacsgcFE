@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use stdClass;
     /** --- CONTIENE DOS VISTAS ADMINENTERPRISE & ENTERPRISE --- */
 class enterpriseController extends Controller
@@ -503,7 +504,15 @@ class enterpriseController extends Controller
 
         $urlPut = 'https://supercarnes-jh.apifacturacionelectronica.xyz/api/ubl2.1/config/'.$enterprise->nit;
 
-        // $authorization = 'Authorization: Bearer '.$enterprise->token;
+        if (gettype($enterprise->token) === 'NULL') {
+            $nuevoToken = Str::random(200);
+            $data->token  = $nuevoToken;
+            $enterprise->token = $nuevoToken;
+            $enterprise->save();
+        } else if (gettype($enterprise->token) !== 'NULL') {
+            $data->token = $enterprise->token;
+        }
+
         $authorization = 'Authorization: Bearer '.$general->masterToken;
 
         $response = Tools::http_put($urlPut, $data, $authorization);
