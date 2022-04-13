@@ -2,6 +2,7 @@
 const routes = [
   {
     path: '/',
+    name: 'home',
     meta: {
       auth: false
     },
@@ -14,6 +15,7 @@ const routes = [
   },
   {
     path: '/enterprises',
+    name: 'enterprises',
     component: () => import('layouts/MyLayout.vue'),
     children: [
       { path: '', component: () => import('pages/enterprise/enterprisePage.vue') },
@@ -22,6 +24,7 @@ const routes = [
   },
   {
     path: '/generals',
+    name: 'generals',
     component: () => import('layouts/MyLayout.vue'),
     children: [
       { path: '', component: () => import('pages/generales/generalsPage.vue') }
